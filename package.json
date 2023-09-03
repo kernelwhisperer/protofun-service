@@ -1,0 +1,22 @@
+{
+  "name": "protofun-alerts",
+  "version": "0.0.1",
+  "private": true,
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Daniel Constantin",
+    "email": "hello@danielconstantin.net"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/app.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.9",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@feathersjs/feathers": "^5.0.8"
+  }
+}
