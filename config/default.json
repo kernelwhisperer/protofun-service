@@ -11,6 +11,6 @@
   },
   "postgresql": {
     "client": "pg",
-    "connection": "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}"
+    "connection": "postgres://your_username:your_password@localhost:5432/your_db_name"
   }
 }
