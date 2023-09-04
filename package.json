@@ -7,16 +7,69 @@
     "name": "Daniel Constantin",
     "email": "hello@danielconstantin.net"
   },
-  "main": "index.js",
-  "scripts": {
-    "start": "ts-node src/app.ts"
+  "main": "lib/client",
+  "engines": {
+    "node": ">= 20.2.0"
   },
-  "devDependencies": {
-    "@types/node": "^20.5.9",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+  "feathers": {
+    "language": "ts",
+    "packager": "yarn",
+    "database": "postgresql",
+    "framework": "koa",
+    "transports": [
+      "rest",
+      "websockets"
+    ],
+    "schema": "json"
+  },
+  "directories": {
+    "lib": "src",
+    "test": "test"
+  },
+  "files": [
+    "lib/client.js",
+    "lib/**/*.d.ts",
+    "lib/**/*.shared.js"
+  ],
+  "scripts": {
+    "dev": "nodemon -x ts-node src/index.ts",
+    "compile": "shx rm -rf lib/ && tsc",
+    "start": "node lib/",
+    "prettier": "npx prettier \"**/*.ts\" --write",
+    "mocha": "cross-env NODE_ENV=test mocha test/ --require ts-node/register --recursive --extension .ts --exit",
+    "test": "cross-env NODE_ENV=test npm run migrate && npm run mocha",
+    "bundle:client": "npm run compile && npm pack --pack-destination ./public",
+    "migrate": "knex migrate:latest",
+    "migrate:make": "knex migrate:make"
   },
   "dependencies": {
-    "@feathersjs/feathers": "^5.0.8"
+    "@feathersjs/adapter-commons": "^5.0.8",
+    "@feathersjs/authentication": "^5.0.8",
+    "@feathersjs/authentication-client": "^5.0.8",
+    "@feathersjs/configuration": "^5.0.8",
+    "@feathersjs/errors": "^5.0.8",
+    "@feathersjs/feathers": "^5.0.8",
+    "@feathersjs/knex": "^5.0.8",
+    "@feathersjs/koa": "^5.0.8",
+    "@feathersjs/schema": "^5.0.8",
+    "@feathersjs/socketio": "^5.0.8",
+    "@feathersjs/transport-commons": "^5.0.8",
+    "knex": "^2.5.1",
+    "pg": "^8.11.1",
+    "winston": "^3.10.0"
+  },
+  "devDependencies": {
+    "@feathersjs/cli": "5.0.8",
+    "@feathersjs/rest-client": "^5.0.8",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.4.2",
+    "axios": "^1.4.0",
+    "cross-env": "^7.0.3",
+    "mocha": "^10.2.0",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.3",
+    "shx": "^0.3.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
   }
 }
