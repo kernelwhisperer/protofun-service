@@ -3,6 +3,7 @@
   "port": 3030,
   "public": "./public/",
   "origins": [
+    "http://localhost:3000",
     "http://localhost:3030"
   ],
   "paginate": {
@@ -12,5 +13,36 @@
   "postgresql": {
     "client": "pg",
     "connection": "postgres://your_username:your_password@localhost:5432/your_db_name"
+  },
+  "authentication": {
+    "entity": "user",
+    "service": "users",
+    "secret": "VbnZ4Y/1yuKqH4l94hYpoj4i8Hn6nNtJ",
+    "authStrategies": [
+      "jwt",
+      "local"
+    ],
+    "jwtOptions": {
+      "header": {
+        "typ": "access"
+      },
+      "audience": "https://yourdomain.com",
+      "algorithm": "HS256",
+      "expiresIn": "1d"
+    },
+    "local": {
+      "usernameField": "email",
+      "passwordField": "password"
+    },
+    "oauth": {
+      "google": {
+        "key": "<Client ID>",
+        "secret": "<Client secret>"
+      },
+      "twitter": {
+        "key": "<Client ID>",
+        "secret": "<Client secret>"
+      }
+    }
   }
 }
