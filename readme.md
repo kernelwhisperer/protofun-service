@@ -1,4 +1,4 @@
-# protofun-alerts
+# protofun-service
 
 > 
 
@@ -12,7 +12,7 @@ This project uses [Feathers](http://feathersjs.com). An open source framework fo
 2. Install your dependencies
 
     ```
-    cd path/to/protofun-alerts
+    cd path/to/protofun-service
     npm install
     ```
 

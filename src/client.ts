@@ -19,7 +19,7 @@ export interface ServiceTypes {}
 export type ClientApplication = Application<ServiceTypes, Configuration>
 
 /**
- * Returns a typed client for the protofun-alerts app.
+ * Returns a typed client for the protofun-service app.
  *
  * @param connection The REST or Socket.io Feathers client connection
  * @param authenticationOptions Additional settings for the authentication client
