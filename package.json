@@ -34,7 +34,7 @@
   "scripts": {
     "dev": "nodemon -x ts-node src/index.ts",
     "compile": "shx rm -rf lib/ && tsc",
-    "postinstall": "npm run compile",
+    "prestart": "npm run compile && npm run migrate",
     "start": "node lib/",
     "build": "docker build -t protofun-service .",
     "prettier": "npx prettier \"**/*.ts\" --write",
