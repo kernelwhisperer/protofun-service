@@ -8,6 +8,7 @@ services:
     expose:
       - "3030"
     environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@protofun_service_db/${POSTGRES_DB}?sslmode=disable
       VIRTUAL_HOST: service.protocol.fun
       VIRTUAL_PORT: 3030
       LETSENCRYPT_HOST: service.protocol.fun
