@@ -10,7 +10,7 @@ export const alertSchema = {
   $id: 'Alert',
   type: 'object',
   additionalProperties: false,
-  required: ['id', 'protocolId', 'metricId', 'triggerValue', 'userId'],
+  required: ['id', 'protocolId', 'metricId', 'triggerValue', 'userId'], // priceUnitIndex TODO
   properties: {
     id: { type: 'number' },
     protocolId: { type: 'string' },
