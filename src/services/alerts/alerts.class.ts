@@ -4,18 +4,18 @@ import { KnexService } from '@feathersjs/knex'
 import type { KnexAdapterParams, KnexAdapterOptions } from '@feathersjs/knex'
 
 import type { Application } from '../../declarations'
-import type { Alerts, AlertsData, AlertsPatch, AlertsQuery } from './alerts.schema'
+import type { Alert, AlertData, AlertPatch, AlertQuery } from './alerts.schema'
 
-export type { Alerts, AlertsData, AlertsPatch, AlertsQuery }
+export type { Alert, AlertData, AlertPatch, AlertQuery }
 
-export interface AlertsParams extends KnexAdapterParams<AlertsQuery> {}
+export interface AlertParams extends KnexAdapterParams<AlertQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
-export class AlertsService<ServiceParams extends Params = AlertsParams> extends KnexService<
-  Alerts,
-  AlertsData,
-  AlertsParams,
-  AlertsPatch
+export class AlertService<ServiceParams extends Params = AlertParams> extends KnexService<
+  Alert,
+  AlertData,
+  AlertParams,
+  AlertPatch
 > {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {

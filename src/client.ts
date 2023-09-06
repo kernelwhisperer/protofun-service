@@ -7,8 +7,8 @@ import type { AuthenticationClientOptions } from '@feathersjs/authentication-cli
 import { userClient } from './services/users/users.shared'
 export type { User, UserData, UserQuery, UserPatch } from './services/users/users.shared'
 
-import { alertsClient } from './services/alerts/alerts.shared'
-export type { Alerts, AlertsData, AlertsQuery, AlertsPatch } from './services/alerts/alerts.shared'
+import { alertClient } from './services/alerts/alerts.shared'
+export type { Alert, AlertData, AlertQuery, AlertPatch } from './services/alerts/alerts.shared'
 
 export interface Configuration {
   connection: TransportConnection<ServiceTypes>
@@ -36,7 +36,7 @@ export const createClient = <Configuration = any,>(
   client.configure(authenticationClient(authenticationOptions))
   client.set('connection', connection)
 
-  client.configure(alertsClient)
+  client.configure(alertClient)
   client.configure(userClient)
   return client
 }

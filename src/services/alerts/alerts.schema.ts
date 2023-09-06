@@ -6,61 +6,67 @@ import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
 
 // Main data model schema
-export const alertsSchema = {
-  $id: 'Alerts',
+export const alertSchema = {
+  $id: 'Alert',
   type: 'object',
   additionalProperties: false,
-  required: ['id', 'protocolId', 'metricId', 'triggerValue'],
+  required: ['id', 'protocolId', 'metricId', 'triggerValue', 'userId'],
   properties: {
     id: { type: 'number' },
     protocolId: { type: 'string' },
     metricId: { type: 'string' },
-    triggerValue: { type: 'string' }
+    triggerValue: { type: 'string' },
+    userId: { type: 'integer' }
   }
 } as const
-export type Alerts = FromSchema<typeof alertsSchema>
-export const alertsValidator = getValidator(alertsSchema, dataValidator)
-export const alertsResolver = resolve<Alerts, HookContext>({})
+export type Alert = FromSchema<typeof alertSchema>
+export const alertValidator = getValidator(alertSchema, dataValidator)
+export const alertResolver = resolve<Alert, HookContext>({})
 
-export const alertsExternalResolver = resolve<Alerts, HookContext>({})
+export const alertExternalResolver = resolve<Alert, HookContext>({})
 
 // Schema for creating new data
-export const alertsDataSchema = {
-  $id: 'AlertsData',
+export const alertDataSchema = {
+  $id: 'AlertData',
   type: 'object',
   additionalProperties: false,
   required: ['protocolId', 'metricId', 'triggerValue'],
   properties: {
-    ...alertsSchema.properties
+    ...alertSchema.properties
   }
 } as const
-export type AlertsData = FromSchema<typeof alertsDataSchema>
-export const alertsDataValidator = getValidator(alertsDataSchema, dataValidator)
-export const alertsDataResolver = resolve<AlertsData, HookContext>({})
+export type AlertData = FromSchema<typeof alertDataSchema>
+export const alertDataValidator = getValidator(alertDataSchema, dataValidator)
+export const alertDataResolver = resolve<AlertData, HookContext>({
+  userId: async (_value, _message, context) => {
+    // Associate the record with the id of the authenticated user
+    return context.params.user.id
+  },
+})
 
 // Schema for updating existing data
-export const alertsPatchSchema = {
-  $id: 'AlertsPatch',
+export const alertPatchSchema = {
+  $id: 'AlertPatch',
   type: 'object',
   additionalProperties: false,
   required: [],
   properties: {
-    ...alertsSchema.properties
+    ...alertSchema.properties
   }
 } as const
-export type AlertsPatch = FromSchema<typeof alertsPatchSchema>
-export const alertsPatchValidator = getValidator(alertsPatchSchema, dataValidator)
-export const alertsPatchResolver = resolve<AlertsPatch, HookContext>({})
+export type AlertPatch = FromSchema<typeof alertPatchSchema>
+export const alertPatchValidator = getValidator(alertPatchSchema, dataValidator)
+export const alertPatchResolver = resolve<AlertPatch, HookContext>({})
 
 // Schema for allowed query properties
-export const alertsQuerySchema = {
-  $id: 'AlertsQuery',
+export const alertQuerySchema = {
+  $id: 'AlertQuery',
   type: 'object',
   additionalProperties: false,
   properties: {
-    ...querySyntax(alertsSchema.properties)
+    ...querySyntax(alertSchema.properties)
   }
 } as const
-export type AlertsQuery = FromSchema<typeof alertsQuerySchema>
-export const alertsQueryValidator = getValidator(alertsQuerySchema, queryValidator)
-export const alertsQueryResolver = resolve<AlertsQuery, HookContext>({})
+export type AlertQuery = FromSchema<typeof alertQuerySchema>
+export const alertQueryValidator = getValidator(alertQuerySchema, queryValidator)
+export const alertQueryResolver = resolve<AlertQuery, HookContext>({})
