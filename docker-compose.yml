@@ -29,7 +29,7 @@ services:
     environment:
       PGWEB_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5433/${POSTGRES_DB}?sslmode=disable
     ports:
-      - "8081:8081"
+      - "8082:8081"
     depends_on:
       - db
 
