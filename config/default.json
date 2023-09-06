@@ -7,8 +7,8 @@
     "http://localhost:3030"
   ],
   "paginate": {
-    "default": 10,
-    "max": 50
+    "default": 100,
+    "max": 1000
   },
   "postgresql": {
     "client": "pg",
@@ -17,7 +17,7 @@
   "authentication": {
     "entity": "user",
     "service": "users",
-    "secret": "VbnZ4Y/1yuKqH4l94hYpoj4i8Hn6nNtJ",
+    "secret": "Miau",
     "authStrategies": [
       "jwt",
       "local"
@@ -26,9 +26,9 @@
       "header": {
         "typ": "access"
       },
-      "audience": "https://yourdomain.com",
+      "audience": "https://protocol.fun",
       "algorithm": "HS256",
-      "expiresIn": "1d"
+      "expiresIn": "30d"
     },
     "local": {
       "usernameField": "email",
