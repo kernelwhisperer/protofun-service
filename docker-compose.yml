@@ -5,6 +5,13 @@ services:
     image: protofun-service
     ports:
       - "3030:3030"
+    environment:
+      VIRTUAL_HOST: service.protocol.fun
+      VIRTUAL_PORT: 3030
+      LETSENCRYPT_HOST: service.protocol.fun
+      LETSENCRYPT_EMAIL: hello@danielconstantin.net
+    networks:
+      - proxy
 
   db:
     image: postgres:13
@@ -28,3 +35,7 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  proxy:
+    external: true
