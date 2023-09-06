@@ -12,6 +12,8 @@ services:
       LETSENCRYPT_EMAIL: hello@danielconstantin.net
     networks:
       - graph-node_proxy
+    depends_on:
+      - db
 
   db:
     image: postgres:13
@@ -23,6 +25,8 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - graph-node_proxy
 
   pgweb:
     image: sosedoff/pgweb
@@ -32,6 +36,8 @@ services:
       - "8082:8081"
     depends_on:
       - db
+    networks:
+      - graph-node_proxy
 
 volumes:
   postgres_data:
