@@ -12,7 +12,7 @@
   },
   "postgresql": {
     "client": "pg",
-    "connection": "postgres://your_username:your_password@localhost:5432/your_db_name"
+    "connection": "postgres://your_username:your_password@localhost:5433/your_db_name"
   },
   "authentication": {
     "entity": "user",
