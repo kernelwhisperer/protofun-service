@@ -18,6 +18,7 @@ const app: Application = koa(feathers())
 app.configure(configuration(configurationValidator))
 
 // Set up Koa middleware
+// app.use(cors({ origin: "*" }))
 app.use(cors())
 app.use(serveStatic(app.get('public')))
 app.use(errorHandler())
@@ -29,7 +30,7 @@ app.configure(rest())
 app.configure(
   socketio({
     cors: {
-      origin: app.get('origins')
+      origin: '*'
     }
   })
 )
