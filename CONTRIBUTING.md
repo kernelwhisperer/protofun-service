@@ -16,6 +16,5 @@ After commit & push:
   git pull
   cp .env.example .env
   touch config/.production
-  npm run build
-  docker-compose up -d
+  npm run build && docker compose up -d
   ```
