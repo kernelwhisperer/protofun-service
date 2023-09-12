@@ -1,7 +1,7 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.class.html#database-services
 import type { Params } from '@feathersjs/feathers'
+import type { KnexAdapterOptions, KnexAdapterParams } from '@feathersjs/knex'
 import { KnexService } from '@feathersjs/knex'
-import type { KnexAdapterParams, KnexAdapterOptions } from '@feathersjs/knex'
 
 import type { Application } from '../../declarations'
 import type { Alert, AlertData, AlertPatch, AlertQuery } from './alerts.schema'
@@ -20,8 +20,8 @@ export class AlertService<ServiceParams extends Params = AlertParams> extends Kn
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
   return {
-    paginate: app.get('paginate'),
     Model: app.get('postgresqlClient'),
-    name: 'alerts'
+    name: 'alerts',
+    paginate: app.get('paginate')
   }
 }

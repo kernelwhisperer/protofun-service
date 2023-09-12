@@ -1,5 +1,6 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.shared.html
 import type { Params } from '@feathersjs/feathers'
+
 import type { ClientApplication } from '../../client'
 import type {
   Notification,
@@ -11,14 +12,14 @@ import type {
 
 export type { Notification, NotificationData, NotificationPatch, NotificationQuery }
 
+export const notificationMethods = ['find', 'get', 'create', 'patch', 'remove'] as const
+
 export type NotificationClientService = Pick<
   NotificationService<Params<NotificationQuery>>,
   (typeof notificationMethods)[number]
 >
 
 export const notificationPath = 'notifications'
-
-export const notificationMethods = ['find', 'get', 'create', 'patch', 'remove'] as const
 
 export const notificationClient = (client: ClientApplication) => {
   const connection = client.get('connection')

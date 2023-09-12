@@ -1,16 +1,28 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
-import { resolve, getValidator, querySyntax, virtual } from '@feathersjs/schema'
 import type { FromSchema } from '@feathersjs/schema'
+import { getValidator, querySyntax, resolve } from '@feathersjs/schema'
+import { MetricId, ProtocolId } from 'protofun'
 
 import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
-import { MetricId, ProtocolId } from 'protofun'
 
 // Main data model schema
 export const alertSchema = {
   $id: 'Alert',
-  type: 'object',
   additionalProperties: false,
+  properties: {
+    createdAt: { type: 'number' },
+    id: { type: 'number' },
+    increase: { type: 'boolean' },
+    metricId: { type: 'string' },
+    paused: { type: 'boolean' },
+    protocolId: { type: 'string' },
+    startTimestamp: { type: 'string' },
+    startValue: { type: 'string' },
+    triggerValue: { type: 'string' },
+    updatedAt: { type: 'number' },
+    userId: { type: 'integer' }
+  },
   required: [
     'id',
     'protocolId',
@@ -24,23 +36,11 @@ export const alertSchema = {
     'paused'
     // priceUnitIndex TODO
   ],
-  properties: {
-    id: { type: 'number' },
-    protocolId: { type: 'string' },
-    metricId: { type: 'string' },
-    triggerValue: { type: 'string' },
-    userId: { type: 'integer' },
-    createdAt: { type: 'number' },
-    updatedAt: { type: 'number' },
-    startValue: { type: 'string' },
-    startTimestamp: { type: 'string' },
-    increase: { type: 'boolean' },
-    paused: { type: 'boolean' }
-  }
+  type: 'object'
 } as const
 export type Alert = FromSchema<typeof alertSchema> & {
-  protocolId: ProtocolId
   metricId: MetricId
+  protocolId: ProtocolId
 }
 export const alertValidator = getValidator(alertSchema, dataValidator)
 export const alertResolver = resolve<Alert, HookContext>({})
@@ -50,38 +50,38 @@ export const alertExternalResolver = resolve<Alert, HookContext>({})
 // Schema for creating new data
 export const alertDataSchema = {
   $id: 'AlertData',
-  type: 'object',
   additionalProperties: false,
-  required: ['protocolId', 'metricId', 'triggerValue', 'startValue', 'startTimestamp'],
   properties: {
     ...alertSchema.properties
-  }
+  },
+  required: ['protocolId', 'metricId', 'triggerValue', 'startValue', 'startTimestamp'],
+  type: 'object'
 } as const
 export type AlertData = FromSchema<typeof alertDataSchema>
 export const alertDataValidator = getValidator(alertDataSchema, dataValidator)
 export const alertDataResolver = resolve<AlertData, HookContext>({
-  userId: async (_value, _message, context) => {
-    // Associate the record with the id of the authenticated user
-    return context.params.user.id
-  },
   createdAt: async () => {
     return Math.floor(Date.now() / 1000)
   },
-  paused: async () => false,
   increase: async (_value, alert) => {
     return parseInt(alert.startValue) < parseInt(alert.triggerValue)
+  },
+  paused: async () => false,
+  userId: async (_value, _message, context) => {
+    // Associate the record with the id of the authenticated user
+    return context.params.user.id
   }
 })
 
 // Schema for updating existing data
 export const alertPatchSchema = {
   $id: 'AlertPatch',
-  type: 'object',
   additionalProperties: false,
-  required: [],
   properties: {
     ...alertSchema.properties
-  }
+  },
+  required: [],
+  type: 'object'
 } as const
 export type AlertPatch = FromSchema<typeof alertPatchSchema>
 export const alertPatchValidator = getValidator(alertPatchSchema, dataValidator)
@@ -94,11 +94,11 @@ export const alertPatchResolver = resolve<AlertPatch, HookContext>({
 // Schema for allowed query properties
 export const alertQuerySchema = {
   $id: 'AlertQuery',
-  type: 'object',
   additionalProperties: false,
   properties: {
     ...querySyntax(alertSchema.properties)
-  }
+  },
+  type: 'object'
 } as const
 export type AlertQuery = FromSchema<typeof alertQuerySchema>
 export const alertQueryValidator = getValidator(alertQuerySchema, queryValidator)

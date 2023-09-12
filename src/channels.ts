@@ -1,7 +1,9 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/channels.html
-import type { RealTimeConnection, Params } from '@feathersjs/feathers'
-import type { AuthenticationResult } from '@feathersjs/authentication'
 import '@feathersjs/transport-commons'
+
+import type { AuthenticationResult } from '@feathersjs/authentication'
+import type { Params, RealTimeConnection } from '@feathersjs/feathers'
+
 import type { Application, HookContext } from './declarations'
 import { logger } from './logger'
 
@@ -27,8 +29,7 @@ export const channels = (app: Application) => {
     }
   })
 
-  // eslint-disable-next-line no-unused-vars
-  app.publish((data: any, context: HookContext) => {
+  app.publish((_data: unknown, _context: HookContext) => {
     // Here you can add event publishers to channels set up in `channels.js`
     // To publish only for a specific event use `app.publish(eventname, () => {})`
 

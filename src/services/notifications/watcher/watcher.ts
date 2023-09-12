@@ -1,25 +1,26 @@
 import { Candle } from 'protofun'
+
 import type { Application } from '../../../declarations'
-import { Alert, alertPath } from '../../alerts/alerts.shared'
-import { getLowestTimeframe, loadQueryFn } from '../../../utils'
-import { notificationPath } from '../notifications.shared'
 import { logger } from '../../../logger'
+import { getLowestTimeframe, loadQueryFn } from '../../../utils'
+import { Alert, alertPath } from '../../alerts/alerts.shared'
+import { notificationPath } from '../notifications.shared'
 
 function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
   candles.forEach((candleRaw) => {
     const candle = {
-      open: parseInt(candleRaw.open),
+      close: parseInt(candleRaw.close),
       high: parseInt(candleRaw.high),
       low: parseInt(candleRaw.low),
-      close: parseInt(candleRaw.close)
+      open: parseInt(candleRaw.open)
     }
 
     alerts.forEach((alert) => {
       if (alert.paused) return
       const triggerValue = parseInt(alert.triggerValue)
 
-      // same candle, ignore high only look at close
-      alert.startTimestamp === candleRaw.timestamp
+      // same candle, ignore high only look at close TODO
+      // alert.startTimestamp === candleRaw.timestamp
 
       if (
         (alert.increase && candle.high >= triggerValue) ||
@@ -74,7 +75,7 @@ export async function watcher(app: Application) {
   const { query, supportedTimeframes } = await loadQueryFn('eth', 'base_fee')
   const timeframe = getLowestTimeframe(supportedTimeframes)
 
-  let oldestTimestamp = alerts.reduce(
+  const oldestTimestamp = alerts.reduce(
     (acc, x) =>
       Math.min(acc, x.startTimestamp ? parseInt(x.startTimestamp) : Number.POSITIVE_INFINITY),
     Number.POSITIVE_INFINITY
@@ -82,9 +83,9 @@ export async function watcher(app: Application) {
   logger.info(`Notification watcher: oldestTimestamp=${oldestTimestamp}`)
 
   const initialCandles = (await query({
-    timeframe,
+    limit: oldestTimestamp !== Number.POSITIVE_INFINITY ? undefined : 1,
     since: oldestTimestamp !== Number.POSITIVE_INFINITY ? String(oldestTimestamp) : undefined,
-    limit: oldestTimestamp !== Number.POSITIVE_INFINITY ? undefined : 1
+    timeframe
   })) as Candle[]
 
   logger.info(`Notification watcher: initialCandles.length=${initialCandles.length}`)
@@ -96,8 +97,8 @@ export async function watcher(app: Application) {
   setInterval(async () => {
     logger.info(`Notification watcher: polling start alerts.length=${alerts.length}`)
     const candles = (await query({
-      timeframe,
-      since: lastTimestamp
+      since: lastTimestamp,
+      timeframe
     })) as Candle[]
 
     lastTimestamp = candles[candles.length - 1].timestamp

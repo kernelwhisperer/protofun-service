@@ -1,28 +1,26 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/client.html
-import { feathers } from '@feathersjs/feathers'
-import type { TransportConnection, Application } from '@feathersjs/feathers'
-import authenticationClient from '@feathersjs/authentication-client'
 import type { AuthenticationClientOptions } from '@feathersjs/authentication-client'
+import authenticationClient from '@feathersjs/authentication-client'
+import type { Application, TransportConnection } from '@feathersjs/feathers'
+import { feathers } from '@feathersjs/feathers'
 
+import { alertClient } from './services/alerts/alerts.shared'
 import { notificationClient } from './services/notifications/notifications.shared'
+import { userClient } from './services/users/users.shared'
+export type { Alert, AlertData, AlertPatch, AlertQuery } from './services/alerts/alerts.shared'
 export type {
   Notification,
   NotificationData,
-  NotificationQuery,
-  NotificationPatch
+  NotificationPatch,
+  NotificationQuery
 } from './services/notifications/notifications.shared'
+export type { User, UserData, UserPatch, UserQuery } from './services/users/users.shared'
 
-import { userClient } from './services/users/users.shared'
-export type { User, UserData, UserQuery, UserPatch } from './services/users/users.shared'
-
-import { alertClient } from './services/alerts/alerts.shared'
-export type { Alert, AlertData, AlertQuery, AlertPatch } from './services/alerts/alerts.shared'
+export interface ServiceTypes {}
 
 export interface Configuration {
   connection: TransportConnection<ServiceTypes>
 }
-
-export interface ServiceTypes {}
 
 export type ClientApplication = Application<ServiceTypes, Configuration>
 

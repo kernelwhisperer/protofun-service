@@ -1,12 +1,11 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/client.test.html
+import rest from '@feathersjs/rest-client'
 import assert from 'assert'
 import axios from 'axios'
 
-import rest from '@feathersjs/rest-client'
-import authenticationClient from '@feathersjs/authentication-client'
 import { app } from '../src/app'
-import { createClient } from '../src/client'
 import type { UserData } from '../src/client'
+import { createClient } from '../src/client'
 
 const port = app.get('port')
 const appUrl = `http://${app.get('host')}:${port}`
