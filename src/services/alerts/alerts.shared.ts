@@ -5,7 +5,10 @@ import type { Alert, AlertData, AlertPatch, AlertQuery, AlertService } from './a
 
 export type { Alert, AlertData, AlertPatch, AlertQuery }
 
-export type AlertClientService = Pick<AlertService<Params<AlertQuery>>, (typeof alertMethods)[number]>
+export type AlertClientService = Pick<
+  AlertService<Params<AlertQuery>>,
+  (typeof alertMethods)[number]
+>
 
 export const alertPath = 'alerts'
 

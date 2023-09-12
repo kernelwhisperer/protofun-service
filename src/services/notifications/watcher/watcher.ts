@@ -25,7 +25,9 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
         (alert.increase && candle.high >= triggerValue) ||
         (!alert.increase && candle.low <= triggerValue)
       ) {
-        logger.info(`Notification watcher: Alert triggered -------------------------------- ${alert.id}`)
+        logger.info(
+          `Notification watcher: Alert triggered -------------------------------- ${alert.id}`
+        )
         alert.paused = true
         app.service(alertPath).patch(alert.id, {
           paused: true
@@ -73,7 +75,8 @@ export async function watcher(app: Application) {
   const timeframe = getLowestTimeframe(supportedTimeframes)
 
   let oldestTimestamp = alerts.reduce(
-    (acc, x) => Math.min(acc, x.startTimestamp ? parseInt(x.startTimestamp) : Number.POSITIVE_INFINITY),
+    (acc, x) =>
+      Math.min(acc, x.startTimestamp ? parseInt(x.startTimestamp) : Number.POSITIVE_INFINITY),
     Number.POSITIVE_INFINITY
   )
   logger.info(`Notification watcher: oldestTimestamp=${oldestTimestamp}`)

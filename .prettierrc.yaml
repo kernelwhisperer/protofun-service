@@ -1,0 +1,8 @@
+semi: false
+# singleQuote: false
+singleQuote: true
+tabWidth: 2
+useTabs: false
+# trailingComma: es5
+trailingComma: none
+printWidth: 100

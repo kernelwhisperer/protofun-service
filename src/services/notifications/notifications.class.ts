@@ -16,12 +16,9 @@ export type { Notification, NotificationData, NotificationPatch, NotificationQue
 export interface NotificationParams extends KnexAdapterParams<NotificationQuery> {}
 
 // By default calls the standard Knex adapter service methods but can be customized with your own functionality.
-export class NotificationService<ServiceParams extends Params = NotificationParams> extends KnexService<
-  Notification,
-  NotificationData,
-  NotificationParams,
-  NotificationPatch
-> {}
+export class NotificationService<
+  ServiceParams extends Params = NotificationParams
+> extends KnexService<Notification, NotificationData, NotificationParams, NotificationPatch> {}
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
   return {

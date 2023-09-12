@@ -40,11 +40,20 @@ export const alert = (app: Application) => {
       ]
     },
     before: {
-      all: [schemaHooks.validateQuery(alertQueryValidator), schemaHooks.resolveQuery(alertQueryResolver)],
+      all: [
+        schemaHooks.validateQuery(alertQueryValidator),
+        schemaHooks.resolveQuery(alertQueryResolver)
+      ],
       find: [],
       get: [],
-      create: [schemaHooks.validateData(alertDataValidator), schemaHooks.resolveData(alertDataResolver)],
-      patch: [schemaHooks.validateData(alertPatchValidator), schemaHooks.resolveData(alertPatchResolver)],
+      create: [
+        schemaHooks.validateData(alertDataValidator),
+        schemaHooks.resolveData(alertDataResolver)
+      ],
+      patch: [
+        schemaHooks.validateData(alertPatchValidator),
+        schemaHooks.resolveData(alertPatchResolver)
+      ],
       remove: []
     },
     after: {
