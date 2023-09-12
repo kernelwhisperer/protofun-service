@@ -17,7 +17,9 @@ export const userSchema = {
     email: { type: 'string' },
     password: { type: 'string' },
     googleId: { type: 'string' },
-    twitterId: { type: 'string' }
+    twitterId: { type: 'string' },
+    createdAt: { type: 'number' },
+    updatedAt: { type: 'number' }
   }
 } as const
 export type User = FromSchema<typeof userSchema>
@@ -42,7 +44,10 @@ export const userDataSchema = {
 export type UserData = FromSchema<typeof userDataSchema>
 export const userDataValidator = getValidator(userDataSchema, dataValidator)
 export const userDataResolver = resolve<UserData, HookContext>({
-  password: passwordHash({ strategy: 'local' })
+  password: passwordHash({ strategy: 'local' }),
+  createdAt: async () => {
+    return Math.floor(Date.now() / 1000)
+  }
 })
 
 // Schema for updating existing data
@@ -58,7 +63,10 @@ export const userPatchSchema = {
 export type UserPatch = FromSchema<typeof userPatchSchema>
 export const userPatchValidator = getValidator(userPatchSchema, dataValidator)
 export const userPatchResolver = resolve<UserPatch, HookContext>({
-  password: passwordHash({ strategy: 'local' })
+  password: passwordHash({ strategy: 'local' }),
+  updatedAt: async () => {
+    return Math.floor(Date.now() / 1000)
+  }
 })
 
 // Schema for allowed query properties

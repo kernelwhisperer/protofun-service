@@ -17,6 +17,8 @@ import {
 import type { Application } from '../../declarations'
 import { NotificationService, getOptions } from './notifications.class'
 import { notificationPath, notificationMethods } from './notifications.shared'
+import { watcher } from './watcher/watcher'
+import { logger } from '../../logger'
 
 export * from './notifications.class'
 export * from './notifications.schema'
@@ -62,6 +64,10 @@ export const notification = (app: Application) => {
     error: {
       all: []
     }
+  })
+  // Setup watchers
+  watcher(app).then(() => {
+    logger.info('Notification watcher: ready')
   })
 }
 

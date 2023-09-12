@@ -5,8 +5,8 @@ import { alert } from './alerts/alerts'
 import type { Application } from '../declarations'
 
 export const services = (app: Application) => {
-  app.configure(notification)
   app.configure(user)
   app.configure(alert)
+  app.configure(notification)
   // All services will be registered here
 }

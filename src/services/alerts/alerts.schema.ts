@@ -1,25 +1,47 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
-import { resolve, getValidator, querySyntax } from '@feathersjs/schema'
+import { resolve, getValidator, querySyntax, virtual } from '@feathersjs/schema'
 import type { FromSchema } from '@feathersjs/schema'
 
 import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
+import { MetricId, ProtocolId } from 'protofun'
 
 // Main data model schema
 export const alertSchema = {
   $id: 'Alert',
   type: 'object',
   additionalProperties: false,
-  required: ['id', 'protocolId', 'metricId', 'triggerValue', 'userId'], // priceUnitIndex TODO
+  required: [
+    'id',
+    'protocolId',
+    'metricId',
+    'triggerValue',
+    'userId',
+    'createdAt',
+    'startValue',
+    'startTimestamp',
+    'increase',
+    'paused'
+    // priceUnitIndex TODO
+  ],
   properties: {
     id: { type: 'number' },
     protocolId: { type: 'string' },
     metricId: { type: 'string' },
     triggerValue: { type: 'string' },
-    userId: { type: 'integer' }
+    userId: { type: 'integer' },
+    createdAt: { type: 'number' },
+    updatedAt: { type: 'number' },
+    startValue: { type: 'string' },
+    startTimestamp: { type: 'string' },
+    increase: { type: 'boolean' },
+    paused: { type: 'boolean' }
   }
 } as const
-export type Alert = FromSchema<typeof alertSchema>
+export type Alert = FromSchema<typeof alertSchema> & {
+  protocolId: ProtocolId
+  metricId: MetricId
+}
 export const alertValidator = getValidator(alertSchema, dataValidator)
 export const alertResolver = resolve<Alert, HookContext>({})
 
@@ -30,7 +52,7 @@ export const alertDataSchema = {
   $id: 'AlertData',
   type: 'object',
   additionalProperties: false,
-  required: ['protocolId', 'metricId', 'triggerValue'],
+  required: ['protocolId', 'metricId', 'triggerValue', 'startValue', 'startTimestamp'],
   properties: {
     ...alertSchema.properties
   }
@@ -42,6 +64,13 @@ export const alertDataResolver = resolve<AlertData, HookContext>({
     // Associate the record with the id of the authenticated user
     return context.params.user.id
   },
+  createdAt: async () => {
+    return Math.floor(Date.now() / 1000)
+  },
+  paused: async () => false,
+  increase: async (_value, alert) => {
+    return parseInt(alert.startValue) < parseInt(alert.triggerValue)
+  }
 })
 
 // Schema for updating existing data
@@ -56,7 +85,11 @@ export const alertPatchSchema = {
 } as const
 export type AlertPatch = FromSchema<typeof alertPatchSchema>
 export const alertPatchValidator = getValidator(alertPatchSchema, dataValidator)
-export const alertPatchResolver = resolve<AlertPatch, HookContext>({})
+export const alertPatchResolver = resolve<AlertPatch, HookContext>({
+  updatedAt: async () => {
+    return Math.floor(Date.now() / 1000)
+  }
+})
 
 // Schema for allowed query properties
 export const alertQuerySchema = {
