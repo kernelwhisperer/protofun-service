@@ -1,10 +1,10 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.class.html#database-services
-import type { Params } from '@feathersjs/feathers'
-import type { KnexAdapterOptions, KnexAdapterParams } from '@feathersjs/knex'
-import { KnexService } from '@feathersjs/knex'
+import type { Params } from "@feathersjs/feathers"
+import type { KnexAdapterOptions, KnexAdapterParams } from "@feathersjs/knex"
+import { KnexService } from "@feathersjs/knex"
 
-import type { Application } from '../../declarations'
-import type { User, UserData, UserPatch, UserQuery } from './users.schema'
+import type { Application } from "../../declarations"
+import type { User, UserData, UserPatch, UserQuery } from "./users.schema"
 
 export type { User, UserData, UserPatch, UserQuery }
 
@@ -20,8 +20,8 @@ export class UserService<ServiceParams extends Params = UserParams> extends Knex
 
 export const getOptions = (app: Application): KnexAdapterOptions => {
   return {
-    Model: app.get('postgresqlClient'),
-    name: 'users',
-    paginate: app.get('paginate')
+    Model: app.get("postgresqlClient"),
+    name: "users",
+    paginate: app.get("paginate"),
   }
 }

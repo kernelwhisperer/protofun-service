@@ -1,10 +1,10 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
-import { authenticate } from '@feathersjs/authentication'
-import { hooks as schemaHooks } from '@feathersjs/schema'
+import { authenticate } from "@feathersjs/authentication"
+import { hooks as schemaHooks } from "@feathersjs/schema"
 
-import type { Application } from '../../declarations'
-import { logger } from '../../logger'
-import { getOptions, NotificationService } from './notifications.class'
+import type { Application } from "../../declarations"
+import { logger } from "../../logger"
+import { getOptions, NotificationService } from "./notifications.class"
 import {
   notificationDataResolver,
   notificationDataValidator,
@@ -13,13 +13,13 @@ import {
   notificationPatchValidator,
   notificationQueryResolver,
   notificationQueryValidator,
-  notificationResolver
-} from './notifications.schema'
-import { notificationMethods, notificationPath } from './notifications.shared'
-import { watcher } from './watcher/watcher'
+  notificationResolver,
+} from "./notifications.schema"
+import { notificationMethods, notificationPath } from "./notifications.shared"
+import { watcher } from "./watcher/watcher"
 
-export * from './notifications.class'
-export * from './notifications.schema'
+export * from "./notifications.class"
+export * from "./notifications.schema"
 
 // A configure function that registers the service and its hooks via `app.configure`
 export const notification = (app: Application) => {
@@ -29,49 +29,49 @@ export const notification = (app: Application) => {
     events: [],
 
     // A list of all methods this service exposes externally
-    methods: notificationMethods
+    methods: notificationMethods,
   })
   // Initialize hooks
   app.service(notificationPath).hooks({
     after: {
-      all: []
+      all: [],
     },
     around: {
       all: [
-        authenticate('jwt'),
+        authenticate("jwt"),
         schemaHooks.resolveExternal(notificationExternalResolver),
-        schemaHooks.resolveResult(notificationResolver)
-      ]
+        schemaHooks.resolveResult(notificationResolver),
+      ],
     },
     before: {
       all: [
         schemaHooks.validateQuery(notificationQueryValidator),
-        schemaHooks.resolveQuery(notificationQueryResolver)
+        schemaHooks.resolveQuery(notificationQueryResolver),
       ],
       create: [
         schemaHooks.validateData(notificationDataValidator),
-        schemaHooks.resolveData(notificationDataResolver)
+        schemaHooks.resolveData(notificationDataResolver),
       ],
       find: [],
       get: [],
       patch: [
         schemaHooks.validateData(notificationPatchValidator),
-        schemaHooks.resolveData(notificationPatchResolver)
+        schemaHooks.resolveData(notificationPatchResolver),
       ],
-      remove: []
+      remove: [],
     },
     error: {
-      all: []
-    }
+      all: [],
+    },
   })
   // Setup watchers
   watcher(app).then(() => {
-    logger.info('Notification watcher: ready')
+    logger.info("Notification watcher: ready")
   })
 }
 
 // Add this service to the service type index
-declare module '../../declarations' {
+declare module "../../declarations" {
   interface ServiceTypes {
     [notificationPath]: NotificationService
   }

@@ -1,20 +1,20 @@
-import { Knex } from 'knex'
+import { Knex } from "knex"
 
 export async function up(knex: Knex): Promise<void> {
-  await knex.schema.alterTable('alerts', (table) => {
+  await knex.schema.alterTable("alerts", (table) => {
     table
-      .integer('userId')
+      .integer("userId")
       .unsigned()
-      .references('id')
-      .inTable('users')
+      .references("id")
+      .inTable("users")
       .notNullable()
-      .onDelete('CASCADE')
+      .onDelete("CASCADE")
   })
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.schema.alterTable('alerts', (table) => {
-    table.dropForeign(['userId'])
-    table.dropColumn('userId')
+  await knex.schema.alterTable("alerts", (table) => {
+    table.dropForeign(["userId"])
+    table.dropColumn("userId")
   })
 }

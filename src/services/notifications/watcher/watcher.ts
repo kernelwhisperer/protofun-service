@@ -1,10 +1,10 @@
-import { Candle } from 'protofun'
+import { Candle } from "protofun"
 
-import type { Application } from '../../../declarations'
-import { logger } from '../../../logger'
-import { getLowestTimeframe, loadQueryFn } from '../../../utils'
-import { Alert, alertPath } from '../../alerts/alerts.shared'
-import { notificationPath } from '../notifications.shared'
+import type { Application } from "../../../declarations"
+import { logger } from "../../../logger"
+import { getLowestTimeframe, loadQueryFn } from "../../../utils"
+import { Alert, alertPath } from "../../alerts/alerts.shared"
+import { notificationPath } from "../notifications.shared"
 
 function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
   candles.forEach((candleRaw) => {
@@ -12,7 +12,7 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
       close: parseInt(candleRaw.close),
       high: parseInt(candleRaw.high),
       low: parseInt(candleRaw.low),
-      open: parseInt(candleRaw.open)
+      open: parseInt(candleRaw.open),
     }
 
     alerts.forEach((alert) => {
@@ -31,15 +31,15 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
         )
         alert.paused = true
         app.service(alertPath).patch(alert.id, {
-          paused: true
+          paused: true,
         })
         // create notification
         app.service(notificationPath).create({
           // alertId: alert.id,
           // userId: alert.userId
           text: `Base fee per gas ${
-            alert.increase ? 'increased' : 'decreased'
-          } past the value of ${triggerValue}`
+            alert.increase ? "increased" : "decreased"
+          } past the value of ${triggerValue}`,
         })
       }
     })
@@ -50,29 +50,29 @@ export async function watcher(app: Application) {
   let alerts: Alert[] = []
   const { data } = await app.service(alertPath).find({
     query: {
-      metricId: 'base_fee'
+      metricId: "base_fee",
       // $limit: 100,
-    }
+    },
   })
 
   alerts = data
 
-  app.service('alerts').on('created', (alert: Alert) => {
+  app.service("alerts").on("created", (alert: Alert) => {
     logger.info(`Notification watcher: new alert ${JSON.stringify(alert)}`)
     alerts = [...alerts, alert]
   })
 
-  app.service('alerts').on('removed', (alert: Alert) => {
+  app.service("alerts").on("removed", (alert: Alert) => {
     logger.info(`Notification watcher: removed alert ${JSON.stringify(alert)}`)
     alerts = alerts.filter((x) => x.id === alert.id)
   })
 
-  app.service(alertPath).on('created', () => {})
+  app.service(alertPath).on("created", () => {})
 
   logger.info(`Notification watcher: alerts.length=${alerts.length}`)
-  console.log('📜 LOG > watcher > alerts:', alerts)
+  console.log("📜 LOG > watcher > alerts:", alerts)
 
-  const { query, supportedTimeframes } = await loadQueryFn('eth', 'base_fee')
+  const { query, supportedTimeframes } = await loadQueryFn("eth", "base_fee")
   const timeframe = getLowestTimeframe(supportedTimeframes)
 
   const oldestTimestamp = alerts.reduce(
@@ -85,7 +85,7 @@ export async function watcher(app: Application) {
   const initialCandles = (await query({
     limit: oldestTimestamp !== Number.POSITIVE_INFINITY ? undefined : 1,
     since: oldestTimestamp !== Number.POSITIVE_INFINITY ? String(oldestTimestamp) : undefined,
-    timeframe
+    timeframe,
   })) as Candle[]
 
   logger.info(`Notification watcher: initialCandles.length=${initialCandles.length}`)
@@ -98,7 +98,7 @@ export async function watcher(app: Application) {
     logger.info(`Notification watcher: polling start alerts.length=${alerts.length}`)
     const candles = (await query({
       since: lastTimestamp,
-      timeframe
+      timeframe,
     })) as Candle[]
 
     lastTimestamp = candles[candles.length - 1].timestamp

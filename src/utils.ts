@@ -1,6 +1,6 @@
-import { MetricId, ProtocolId, QueryFn, Timeframe } from 'protofun'
+import { MetricId, ProtocolId, QueryFn, Timeframe } from "protofun"
 
-export const allTimeframes: Timeframe[] = ['Block', 'Minute', 'Hour', 'Day', 'Week']
+export const allTimeframes: Timeframe[] = ["Block", "Minute", "Hour", "Day", "Week"]
 
 export async function loadQueryFn(
   protocolId: ProtocolId,
@@ -14,5 +14,5 @@ export async function loadQueryFn(
 }
 
 export function getLowestTimeframe(supportedTimeframes: Timeframe[]) {
-  return supportedTimeframes.find((x) => x !== 'Block') as Timeframe
+  return supportedTimeframes.find((x) => x !== "Block") as Timeframe
 }

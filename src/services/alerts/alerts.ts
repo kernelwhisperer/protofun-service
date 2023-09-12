@@ -1,9 +1,9 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
-import { authenticate } from '@feathersjs/authentication'
-import { hooks as schemaHooks } from '@feathersjs/schema'
+import { authenticate } from "@feathersjs/authentication"
+import { hooks as schemaHooks } from "@feathersjs/schema"
 
-import type { Application } from '../../declarations'
-import { AlertService, getOptions } from './alerts.class'
+import type { Application } from "../../declarations"
+import { AlertService, getOptions } from "./alerts.class"
 import {
   alertDataResolver,
   alertDataValidator,
@@ -12,12 +12,12 @@ import {
   alertPatchValidator,
   alertQueryResolver,
   alertQueryValidator,
-  alertResolver
-} from './alerts.schema'
-import { alertMethods, alertPath } from './alerts.shared'
+  alertResolver,
+} from "./alerts.schema"
+import { alertMethods, alertPath } from "./alerts.shared"
 
-export * from './alerts.class'
-export * from './alerts.schema'
+export * from "./alerts.class"
+export * from "./alerts.schema"
 
 // A configure function that registers the service and its hooks via `app.configure`
 export const alert = (app: Application) => {
@@ -27,45 +27,45 @@ export const alert = (app: Application) => {
     events: [],
 
     // A list of all methods this service exposes externally
-    methods: alertMethods
+    methods: alertMethods,
   })
   // Initialize hooks
   app.service(alertPath).hooks({
     after: {
-      all: []
+      all: [],
     },
     around: {
       all: [
-        authenticate('jwt'),
+        authenticate("jwt"),
         schemaHooks.resolveExternal(alertExternalResolver),
-        schemaHooks.resolveResult(alertResolver)
-      ]
+        schemaHooks.resolveResult(alertResolver),
+      ],
     },
     before: {
       all: [
         schemaHooks.validateQuery(alertQueryValidator),
-        schemaHooks.resolveQuery(alertQueryResolver)
+        schemaHooks.resolveQuery(alertQueryResolver),
       ],
       create: [
         schemaHooks.validateData(alertDataValidator),
-        schemaHooks.resolveData(alertDataResolver)
+        schemaHooks.resolveData(alertDataResolver),
       ],
       find: [],
       get: [],
       patch: [
         schemaHooks.validateData(alertPatchValidator),
-        schemaHooks.resolveData(alertPatchResolver)
+        schemaHooks.resolveData(alertPatchResolver),
       ],
-      remove: []
+      remove: [],
     },
     error: {
-      all: []
-    }
+      all: [],
+    },
   })
 }
 
 // Add this service to the service type index
-declare module '../../declarations' {
+declare module "../../declarations" {
   interface ServiceTypes {
     [alertPath]: AlertService
   }

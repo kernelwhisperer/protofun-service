@@ -1,9 +1,9 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
-import { authenticate } from '@feathersjs/authentication'
-import { hooks as schemaHooks } from '@feathersjs/schema'
+import { authenticate } from "@feathersjs/authentication"
+import { hooks as schemaHooks } from "@feathersjs/schema"
 
-import type { Application } from '../../declarations'
-import { getOptions, UserService } from './users.class'
+import type { Application } from "../../declarations"
+import { getOptions, UserService } from "./users.class"
 import {
   userDataResolver,
   userDataValidator,
@@ -12,12 +12,12 @@ import {
   userPatchValidator,
   userQueryResolver,
   userQueryValidator,
-  userResolver
-} from './users.schema'
-import { userMethods, userPath } from './users.shared'
+  userResolver,
+} from "./users.schema"
+import { userMethods, userPath } from "./users.shared"
 
-export * from './users.class'
-export * from './users.schema'
+export * from "./users.class"
+export * from "./users.schema"
 
 // A configure function that registers the service and its hooks via `app.configure`
 export const user = (app: Application) => {
@@ -27,50 +27,50 @@ export const user = (app: Application) => {
     events: [],
 
     // A list of all methods this service exposes externally
-    methods: userMethods
+    methods: userMethods,
   })
   // Initialize hooks
   app.service(userPath).hooks({
     after: {
-      all: []
+      all: [],
     },
     around: {
       all: [
         schemaHooks.resolveExternal(userExternalResolver),
-        schemaHooks.resolveResult(userResolver)
+        schemaHooks.resolveResult(userResolver),
       ],
       create: [],
-      find: [authenticate('jwt')],
-      get: [authenticate('jwt')],
-      patch: [authenticate('jwt')],
-      remove: [authenticate('jwt')],
-      update: [authenticate('jwt')]
+      find: [authenticate("jwt")],
+      get: [authenticate("jwt")],
+      patch: [authenticate("jwt")],
+      remove: [authenticate("jwt")],
+      update: [authenticate("jwt")],
     },
     before: {
       all: [
         schemaHooks.validateQuery(userQueryValidator),
-        schemaHooks.resolveQuery(userQueryResolver)
+        schemaHooks.resolveQuery(userQueryResolver),
       ],
       create: [
         schemaHooks.validateData(userDataValidator),
-        schemaHooks.resolveData(userDataResolver)
+        schemaHooks.resolveData(userDataResolver),
       ],
       find: [],
       get: [],
       patch: [
         schemaHooks.validateData(userPatchValidator),
-        schemaHooks.resolveData(userPatchResolver)
+        schemaHooks.resolveData(userPatchResolver),
       ],
-      remove: []
+      remove: [],
     },
     error: {
-      all: []
-    }
+      all: [],
+    },
   })
 }
 
 // Add this service to the service type index
-declare module '../../declarations' {
+declare module "../../declarations" {
   interface ServiceTypes {
     [userPath]: UserService
   }
