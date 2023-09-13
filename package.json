@@ -1,6 +1,6 @@
 {
   "name": "protofun-service",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "license": "UNLICENSED",
   "author": {
@@ -37,6 +37,7 @@
     "prestart": "npm run compile && npm run migrate",
     "start": "node lib/",
     "start:prod": "cross-env NODE_ENV=production npm run start",
+    "preversion": "npm run bundle:client",
     "build": "docker build -t protofun-service .",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
