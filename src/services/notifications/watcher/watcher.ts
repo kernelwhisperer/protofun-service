@@ -48,15 +48,19 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
 
 export async function watcher(app: Application) {
   let activeAlerts: Alert[] = []
-  const { data } = await app.service(alertPath).find({
-    query: {
-      metricId: "base_fee",
-      paused: false,
-      // $limit: 100,
-    },
-  })
-
-  activeAlerts = data
+  try {
+    const { data } = await app.service(alertPath).find({
+      query: {
+        metricId: "base_fee",
+        paused: false,
+        // $limit: 100,
+      },
+    })
+    activeAlerts = data
+  } catch (e) {
+    // this throws inside migration
+    console.log("📜 LOG > watcher > failed to fetch: e:", e)
+  }
 
   app.service("alerts").on("created", (alert: Alert) => {
     logger.info(`Notification watcher: new alert ${JSON.stringify(alert)}`)
