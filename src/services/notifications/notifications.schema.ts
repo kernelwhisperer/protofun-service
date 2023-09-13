@@ -1,15 +1,17 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import type { FromSchema } from "@feathersjs/schema"
-import { getValidator, querySyntax, resolve } from "@feathersjs/schema"
+import { getValidator, querySyntax, resolve, virtual } from "@feathersjs/schema"
 
 import type { HookContext } from "../../declarations"
 import { dataValidator, queryValidator } from "../../validators"
+import { AlertRaw, alertSchema } from "../alerts/alerts.schema"
 
 // Main data model schema
 export const notificationSchema = {
   $id: "Notification",
   additionalProperties: false,
   properties: {
+    alert: { $ref: "Alert" },
     alertId: { type: "integer" },
     archived: { type: "boolean" },
     createdAt: { type: "number" },
@@ -21,9 +23,20 @@ export const notificationSchema = {
   required: ["id", "text", "createdAt", "userId", "alertId"],
   type: "object",
 } as const
-export type Notification = FromSchema<typeof notificationSchema>
+export type Notification = FromSchema<
+  typeof notificationSchema,
+  {
+    // All schema references need to be passed to get the correct type
+    references: [typeof alertSchema]
+  }
+>
 export const notificationValidator = getValidator(notificationSchema, dataValidator)
-export const notificationResolver = resolve<Notification, HookContext>({})
+export const notificationResolver = resolve<Notification, HookContext>({
+  alert: virtual(async (message, context) => {
+    // Populate the user associated via `userId`
+    return context.app.service("alerts").get(message.alertId) as Promise<AlertRaw>
+  }),
+})
 
 export const notificationExternalResolver = resolve<Notification, HookContext>({})
 
@@ -37,7 +50,13 @@ export const notificationDataSchema = {
   required: ["text", "alertId", "userId"],
   type: "object",
 } as const
-export type NotificationData = FromSchema<typeof notificationDataSchema>
+export type NotificationData = FromSchema<
+  typeof notificationDataSchema,
+  {
+    // All schema references need to be passed to get the correct type
+    references: [typeof alertSchema]
+  }
+>
 export const notificationDataValidator = getValidator(notificationDataSchema, dataValidator)
 export const notificationDataResolver = resolve<NotificationData, HookContext>({
   archived: async () => false,
@@ -56,7 +75,13 @@ export const notificationPatchSchema = {
   required: [],
   type: "object",
 } as const
-export type NotificationPatch = FromSchema<typeof notificationPatchSchema>
+export type NotificationPatch = FromSchema<
+  typeof notificationPatchSchema,
+  {
+    // All schema references need to be passed to get the correct type
+    references: [typeof alertSchema]
+  }
+>
 export const notificationPatchValidator = getValidator(notificationPatchSchema, dataValidator)
 export const notificationPatchResolver = resolve<NotificationPatch, HookContext>({
   updatedAt: async () => {
@@ -69,10 +94,24 @@ export const notificationQuerySchema = {
   $id: "NotificationQuery",
   additionalProperties: false,
   properties: {
-    ...querySyntax(notificationSchema.properties),
+    ...querySyntax({
+      alertId: { type: "integer" },
+      archived: { type: "boolean" },
+      createdAt: { type: "number" },
+      id: { type: "number" },
+      text: { type: "string" },
+      updatedAt: { type: "number" },
+      userId: { type: "integer" },
+    }),
   },
   type: "object",
 } as const
-export type NotificationQuery = FromSchema<typeof notificationQuerySchema>
+export type NotificationQuery = FromSchema<
+  typeof notificationQuerySchema,
+  {
+    // All schema references need to be passed to get the correct type
+    references: [typeof alertSchema]
+  }
+>
 export const notificationQueryValidator = getValidator(notificationQuerySchema, queryValidator)
 export const notificationQueryResolver = resolve<NotificationQuery, HookContext>({})

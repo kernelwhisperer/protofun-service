@@ -38,7 +38,8 @@ export const alertSchema = {
   ],
   type: "object",
 } as const
-export type Alert = FromSchema<typeof alertSchema> & {
+export type AlertRaw = FromSchema<typeof alertSchema>
+export type Alert = AlertRaw & {
   metricId: MetricId
   protocolId: ProtocolId
 }
@@ -67,6 +68,10 @@ export const alertDataResolver = resolve<AlertData, HookContext>({
     return parseInt(alert.startValue) < parseInt(alert.triggerValue)
   },
   paused: async () => false,
+  userId: async (_value, _message, context) => {
+    // Associate the record with the id of the authenticated user
+    return context.params.user.id
+  },
 })
 
 // Schema for updating existing data

@@ -35,11 +35,11 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
         })
         // create notification
         app.service(notificationPath).create({
-          // alertId: alert.id,
-          // userId: alert.userId
-          text: `Base fee per gas ${
-            alert.increase ? "increased" : "decreased"
-          } past the value of ${triggerValue}`,
+          alertId: alert.id,
+          text: `Ethereum's Base fee per gas ${alert.increase ? "increased" : "decreased"} to ${(
+            triggerValue / 1e9
+          ).toFixed(2)} Gwei.`,
+          userId: alert.userId,
         })
       }
     })
@@ -47,35 +47,38 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
 }
 
 export async function watcher(app: Application) {
-  let alerts: Alert[] = []
+  let activeAlerts: Alert[] = []
   const { data } = await app.service(alertPath).find({
     query: {
       metricId: "base_fee",
+      paused: false,
       // $limit: 100,
     },
   })
 
-  alerts = data
+  activeAlerts = data
 
   app.service("alerts").on("created", (alert: Alert) => {
     logger.info(`Notification watcher: new alert ${JSON.stringify(alert)}`)
-    alerts = [...alerts, alert]
+    activeAlerts = [...activeAlerts, alert]
   })
 
-  app.service("alerts").on("removed", (alert: Alert) => {
-    logger.info(`Notification watcher: removed alert ${JSON.stringify(alert)}`)
-    alerts = alerts.filter((x) => x.id === alert.id)
+  app.service("alerts").on("patched", (alert: Alert) => {
+    logger.info(`Notification watcher: patched alert ${JSON.stringify(alert)}`)
+    if (alert.paused) {
+      activeAlerts = activeAlerts.filter((x) => x.id === alert.id)
+    }
   })
 
   app.service(alertPath).on("created", () => {})
 
-  logger.info(`Notification watcher: alerts.length=${alerts.length}`)
-  console.log("📜 LOG > watcher > alerts:", alerts)
+  logger.info(`Notification watcher: alerts.length=${activeAlerts.length}`)
+  console.log("📜 LOG > watcher > alerts:", activeAlerts)
 
   const { query, supportedTimeframes } = await loadQueryFn("eth", "base_fee")
   const timeframe = getLowestTimeframe(supportedTimeframes)
 
-  const oldestTimestamp = alerts.reduce(
+  const oldestTimestamp = activeAlerts.reduce(
     (acc, x) =>
       Math.min(acc, x.startTimestamp ? parseInt(x.startTimestamp) : Number.POSITIVE_INFINITY),
     Number.POSITIVE_INFINITY
@@ -89,20 +92,20 @@ export async function watcher(app: Application) {
   })) as Candle[]
 
   logger.info(`Notification watcher: initialCandles.length=${initialCandles.length}`)
-  processCandles(initialCandles, alerts, app)
+  processCandles(initialCandles, activeAlerts, app)
 
   let lastTimestamp = initialCandles[initialCandles.length - 1]?.timestamp
   logger.info(`Notification watcher: starting interval lastTimestamp=${lastTimestamp}`)
 
   setInterval(async () => {
-    logger.info(`Notification watcher: polling start alerts.length=${alerts.length}`)
+    logger.info(`Notification watcher: polling start alerts.length=${activeAlerts.length}`)
     const candles = (await query({
       since: lastTimestamp,
       timeframe,
     })) as Candle[]
 
     lastTimestamp = candles[candles.length - 1].timestamp
-    processCandles(candles, alerts, app)
+    processCandles(candles, activeAlerts, app)
 
     logger.info(JSON.stringify(candles))
     logger.info(`lastTimestamp=${lastTimestamp}`)
