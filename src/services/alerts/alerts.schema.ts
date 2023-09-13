@@ -67,10 +67,6 @@ export const alertDataResolver = resolve<AlertData, HookContext>({
     return parseInt(alert.startValue) < parseInt(alert.triggerValue)
   },
   paused: async () => false,
-  userId: async (_value, _message, context) => {
-    // Associate the record with the id of the authenticated user
-    return context.params.user.id
-  },
 })
 
 // Schema for updating existing data

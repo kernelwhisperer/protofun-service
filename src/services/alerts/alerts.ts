@@ -1,6 +1,7 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.html
 import { authenticate } from "@feathersjs/authentication"
 import { hooks as schemaHooks } from "@feathersjs/schema"
+import { setField } from "feathers-hooks-common"
 
 import type { Application } from "../../declarations"
 import { AlertService, getOptions } from "./alerts.class"
@@ -43,6 +44,10 @@ export const alert = (app: Application) => {
     },
     before: {
       all: [
+        setField({
+          as: "params.query.userId",
+          from: "params.user.id",
+        }),
         schemaHooks.validateQuery(alertQueryValidator),
         schemaHooks.resolveQuery(alertQueryResolver),
       ],
