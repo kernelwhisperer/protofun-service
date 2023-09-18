@@ -8,7 +8,7 @@ After commit & push:
 
   ```sh
   yarn version
-  git add && git commit -m "Add new bundle"
+  git add . && git commit -m "Add new bundle"
   ```
 
 2. Update the server
