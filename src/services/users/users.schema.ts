@@ -16,9 +16,34 @@ export const userSchema = {
     googleId: { type: "string" },
     id: { type: "number" },
     password: { type: "string" },
+    pushDevices: {
+      items: {
+        properties: {
+          label: { type: "string" },
+          sub: {
+            properties: {
+              endpoint: { type: "string" },
+              expirationTime: { anyOf: [{ type: "number" }, { type: "null" }] },
+              keys: {
+                properties: {
+                  auth: { type: "string" },
+                  p256dh: { type: "string" },
+                },
+                required: ["auth", "p256dh"],
+                type: "object",
+              },
+            },
+            required: ["endpoint", "keys"],
+            type: "object",
+          },
+        },
+        required: ["label", "sub"],
+        type: "object",
+      },
+      type: "array",
+    },
     twitterId: { type: "string" },
     updatedAt: { type: "number" },
-    webpush: { type: "string" },
   },
   required: ["id", "email"],
   type: "object",
@@ -65,6 +90,9 @@ export type UserPatch = FromSchema<typeof userPatchSchema>
 export const userPatchValidator = getValidator(userPatchSchema, dataValidator)
 export const userPatchResolver = resolve<UserPatch, HookContext>({
   password: passwordHash({ strategy: "local" }),
+  pushDevices: async (_value, user) => {
+    return JSON.stringify(user.pushDevices) as any
+  },
   updatedAt: async () => {
     return Math.floor(Date.now() / 1000)
   },

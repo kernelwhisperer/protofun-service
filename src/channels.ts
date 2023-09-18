@@ -7,11 +7,19 @@ import type { Params, RealTimeConnection } from "@feathersjs/feathers"
 import type { Application, HookContext } from "./declarations"
 
 interface DataWithUserId {
-  userId?: number
+  userId: number
+}
+
+interface UserData {
+  id: number
 }
 
 function isDataWithUserId(data: unknown): data is DataWithUserId {
   return typeof data === "object" && data !== null && "userId" in data
+}
+
+function isUserPatchData(data: unknown): data is UserData {
+  return typeof data === "object" && data !== null && "password" in data && "id" in data
 }
 
 export const channels = (app: Application) => {
@@ -32,9 +40,13 @@ export const channels = (app: Application) => {
     }
   })
 
-  app.publish((data: unknown, _context: HookContext) => {
-    if (isDataWithUserId(data) && data.userId) {
+  app.publish(async (data: unknown, _context: HookContext) => {
+    if (isDataWithUserId(data)) {
       return app.channel(`user-${data.userId}`)
+    }
+
+    if (isUserPatchData(data)) {
+      return app.channel(`user-${data.id}`)
     }
 
     throw new Error(`Cannot find user channel: ${JSON.stringify(data)}`)
