@@ -39,6 +39,7 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
           text: `Ethereum's Base fee per gas ${alert.increase ? "increased" : "decreased"} to ${(
             triggerValue / 1e9
           ).toFixed(2)} Gwei.`,
+          title: "Ethereum's Base fee per gas",
           userId: alert.userId,
         })
       }
@@ -63,6 +64,7 @@ export async function watcher(app: Application) {
   }
 
   app.service("alerts").on("created", (alert: Alert) => {
+    if (alert.metricId !== "base_fee") return // TODO
     logger.info(`Notification watcher: new alert ${JSON.stringify(alert)}`)
     activeAlerts = [...activeAlerts, alert]
   })
@@ -73,8 +75,6 @@ export async function watcher(app: Application) {
       activeAlerts = activeAlerts.filter((x) => x.id === alert.id)
     }
   })
-
-  app.service(alertPath).on("created", () => {})
 
   logger.info(`Notification watcher: alerts.length=${activeAlerts.length}`)
   console.log("📜 LOG > watcher > alerts:", activeAlerts)

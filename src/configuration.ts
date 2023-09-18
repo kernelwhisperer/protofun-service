@@ -11,10 +11,26 @@ export const configurationSchema = {
     host: { type: "string" },
     port: { type: "number" },
     public: { type: "string" },
+    webPush: {
+      properties: {
+        privateKey: { type: "string" },
+        publicKey: { type: "string" },
+      },
+      type: "object",
+    },
   },
-  required: ["host", "port", "public"],
+  required: ["host", "port", "public", "webPush"],
   type: "object",
 } as const
+
+declare module "./declarations" {
+  interface Configuration {
+    webPush: {
+      privateKey: string
+      publicKey: string
+    }
+  }
+}
 
 export const configurationValidator = getValidator(configurationSchema, dataValidator)
 

@@ -18,6 +18,7 @@ export const userSchema = {
     password: { type: "string" },
     twitterId: { type: "string" },
     updatedAt: { type: "number" },
+    webpush: { type: "string" },
   },
   required: ["id", "email"],
   type: "object",

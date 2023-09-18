@@ -11,16 +11,18 @@ export const notificationSchema = {
   $id: "Notification",
   additionalProperties: false,
   properties: {
+    // NOTE: notificationQuerySchema must be updated as well.
     alert: { $ref: "Alert" },
     alertId: { type: "integer" },
     archived: { type: "boolean" },
     createdAt: { type: "number" },
     id: { type: "number" },
     text: { type: "string" },
+    title: { type: "string" },
     updatedAt: { type: "number" },
     userId: { type: "integer" },
   },
-  required: ["id", "text", "createdAt", "userId", "alertId"],
+  required: ["id", "text", "createdAt", "userId", "title"],
   type: "object",
 } as const
 export type Notification = FromSchema<
@@ -34,6 +36,7 @@ export const notificationValidator = getValidator(notificationSchema, dataValida
 export const notificationResolver = resolve<Notification, HookContext>({
   alert: virtual(async (message, context) => {
     // Populate the user associated via `userId`
+    if (!message.alertId) return
     return context.app.service("alerts").get(message.alertId) as Promise<AlertRaw>
   }),
 })
@@ -47,7 +50,7 @@ export const notificationDataSchema = {
   properties: {
     ...notificationSchema.properties,
   },
-  required: ["text", "alertId", "userId"],
+  required: ["text", "title", "userId"],
   type: "object",
 } as const
 export type NotificationData = FromSchema<
@@ -100,6 +103,7 @@ export const notificationQuerySchema = {
       createdAt: { type: "number" },
       id: { type: "number" },
       text: { type: "string" },
+      title: { type: "string" },
       updatedAt: { type: "number" },
       userId: { type: "integer" },
     }),

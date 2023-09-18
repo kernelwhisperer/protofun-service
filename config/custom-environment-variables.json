@@ -9,5 +9,9 @@
   },
   "postgresql": {
     "connection": "DATABASE_URL"
+  },
+  "webPush": {
+    "publicKey": "WEB_PUSH_PUB_KEY",
+    "privateKey": "WEB_PUSH_PRIVATE_KEY"
   }
 }
