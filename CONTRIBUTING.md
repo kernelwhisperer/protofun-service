@@ -8,13 +8,13 @@ After commit & push:
 
   ```sh
   yarn version
-  git add . && git commit -m "Add new bundle"
+  git add . && git commit -m "Add new bundle" && git push
   ```
 
 2. Update the server
 
   ```sh
-  git pull
+  cd repos/protofun-service && git pull
   # cp .env.example .env
   npm run build && docker compose up -d
   ```
