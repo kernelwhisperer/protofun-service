@@ -26,9 +26,7 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
         (alert.increase && candle.high >= triggerValue) ||
         (!alert.increase && candle.low <= triggerValue)
       ) {
-        logger.info(
-          `Notification watcher: Alert triggered -------------------------------- ${alert.id}`
-        )
+        logger.info(`Notification watcher: Alert triggered ------------- ${alert.id}`)
         alert.paused = true
         app.service(alertPath).patch(alert.id, {
           paused: true,
@@ -39,7 +37,7 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
           text: `Ethereum's Base fee per gas ${alert.increase ? "increased" : "decreased"} to ${(
             triggerValue / 1e9
           ).toFixed(2)} Gwei.`,
-          title: "Ethereum's Base fee per gas",
+          title: "Base fee per gas",
           userId: alert.userId,
         })
       }
@@ -52,15 +50,15 @@ export async function watcher(app: Application) {
   try {
     const { data } = await app.service(alertPath).find({
       query: {
+        $limit: 1000,
         metricId: "base_fee",
         paused: false,
-        // $limit: 100,
       },
     })
     activeAlerts = data
-  } catch (e) {
+  } catch (error) {
     // this throws inside migration
-    console.log("📜 LOG > watcher > failed to fetch: e:", e)
+    logger.info(`Notification watcher: error${String(error)}`)
   }
 
   app.service("alerts").on("created", (alert: Alert) => {
@@ -77,7 +75,6 @@ export async function watcher(app: Application) {
   })
 
   logger.info(`Notification watcher: alerts.length=${activeAlerts.length}`)
-  console.log("📜 LOG > watcher > alerts:", activeAlerts)
 
   const { query, supportedTimeframes } = await loadQueryFn("eth", "base_fee")
   const timeframe = getLowestTimeframe(supportedTimeframes)

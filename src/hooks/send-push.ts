@@ -27,10 +27,10 @@ export const sendPush = async (context: HookContext) => {
       options: {
         badge: "/icon-512x512.png",
         body: notification.text,
-        data: { url: "https://protocol.fun" },
+        data: { url: "https://protocol.fun/eth/base_fee" },
+        icon: "/assets/eth.svg",
         tag: "Test",
         timestamp: notification.createdAt * 1000,
-        // icon: "/icon-512x512.png",
         // image: "/icon-512x512.png",
       },
       title: notification.title,
