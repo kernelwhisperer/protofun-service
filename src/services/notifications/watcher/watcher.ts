@@ -1,8 +1,8 @@
-import { Candle } from "protofun"
+import { Candle, getLowestTimeframe, METRICS } from "protofun"
 
 import type { Application } from "../../../declarations"
 import { logger } from "../../../logger"
-import { getLowestTimeframe, loadQueryFn } from "../../../utils"
+import { loadMetricFns } from "../../../utils"
 import { Alert, alertPath } from "../../alerts/alerts.shared"
 import { notificationPath } from "../notifications.shared"
 
@@ -51,7 +51,6 @@ export async function watcher(app: Application) {
     const { data } = await app.service(alertPath).find({
       query: {
         $limit: 1000,
-        metricId: "base_fee",
         paused: false,
       },
     })
@@ -62,7 +61,6 @@ export async function watcher(app: Application) {
   }
 
   app.service("alerts").on("created", (alert: Alert) => {
-    if (alert.metricId !== "base_fee") return // TODO
     logger.info(`Notification watcher: new alert ${JSON.stringify(alert)}`)
     activeAlerts = [...activeAlerts, alert]
   })
@@ -73,43 +71,50 @@ export async function watcher(app: Application) {
       activeAlerts = activeAlerts.filter((x) => x.id === alert.id)
     }
   })
-
   logger.info(`Notification watcher: alerts.length=${activeAlerts.length}`)
 
-  const { query, supportedTimeframes } = await loadQueryFn("eth", "base_fee")
-  const timeframe = getLowestTimeframe(supportedTimeframes)
+  METRICS.forEach(async (metric) => {
+    logger.info(`Notification watcher: setup ${metric.id}`)
 
-  const oldestTimestamp = activeAlerts.reduce(
-    (acc, x) =>
-      Math.min(acc, x.startTimestamp ? parseInt(x.startTimestamp) : Number.POSITIVE_INFINITY),
-    Number.POSITIVE_INFINITY
-  )
-  logger.info(`Notification watcher: oldestTimestamp=${oldestTimestamp}`)
+    const { subscribe, query } = await loadMetricFns(metric.protocol, metric.id)
+    const timeframe = getLowestTimeframe(metric.timeframes)
 
-  const initialCandles = (await query({
-    limit: oldestTimestamp !== Number.POSITIVE_INFINITY ? undefined : 1,
-    since: oldestTimestamp !== Number.POSITIVE_INFINITY ? String(oldestTimestamp) : undefined,
-    timeframe,
-  })) as Candle[]
+    if (!subscribe) {
+      logger.info(`Notification watcher: skipped ${metric.id}`)
+      return
+    }
 
-  logger.info(`Notification watcher: initialCandles.length=${initialCandles.length}`)
-  processCandles(initialCandles, activeAlerts, app)
+    const metricAlerts = activeAlerts.filter((x) => x.metricId === metric.id)
+    const oldestTimestamp = metricAlerts.reduce(
+      (acc, x) =>
+        Math.min(acc, x.startTimestamp ? parseInt(x.startTimestamp) : Number.POSITIVE_INFINITY),
+      Number.POSITIVE_INFINITY
+    )
+    logger.info(`Notification watcher: ${metric.id} oldestTimestamp=${oldestTimestamp}`)
 
-  let lastTimestamp = initialCandles[initialCandles.length - 1]?.timestamp
-  logger.info(`Notification watcher: starting interval lastTimestamp=${lastTimestamp}`)
-
-  setInterval(async () => {
-    logger.info(`Notification watcher: polling start alerts.length=${activeAlerts.length}`)
-    const candles = (await query({
-      since: lastTimestamp,
+    const initialCandles = (await query({
+      limit: oldestTimestamp !== Number.POSITIVE_INFINITY ? undefined : 1,
+      since: oldestTimestamp !== Number.POSITIVE_INFINITY ? String(oldestTimestamp) : undefined,
       timeframe,
     })) as Candle[]
 
-    lastTimestamp = candles[candles.length - 1].timestamp
-    processCandles(candles, activeAlerts, app)
+    logger.info(`Notification watcher: ${metric.id} initialCandles.length=${initialCandles.length}`)
+    processCandles(initialCandles, metricAlerts, app)
 
-    logger.info(JSON.stringify(candles))
-    logger.info(`lastTimestamp=${lastTimestamp}`)
-    logger.info(`Notification watcher: polling finish`)
-  }, 3000)
+    const initialTimestamp = initialCandles[initialCandles.length - 1]?.timestamp
+    logger.info(
+      `Notification watcher: ${metric.id} starting interval initialTimestamp=${initialTimestamp}`
+    )
+
+    subscribe({
+      onNewData: (data: Candle) => {
+        const metricAlerts = activeAlerts.filter((x) => x.metricId === metric.id)
+        processCandles([data], metricAlerts, app)
+        logger.info(`${metric.id} data=${JSON.stringify(data)}`)
+      },
+      pollingInterval: metric.id === "base_fee" ? 6_000 : 12_000,
+      since: initialTimestamp,
+      timeframe,
+    })
+  })
 }

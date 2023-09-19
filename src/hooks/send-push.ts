@@ -11,6 +11,7 @@ type PayloadShape = {
 
 export const sendPush = async (context: HookContext) => {
   const notification = context.result as Notification
+  const { alert } = notification
   const user = await context.app.service("users").get(notification.userId)
 
   if (!user.pushDevices) return
@@ -22,20 +23,30 @@ export const sendPush = async (context: HookContext) => {
     vapidKeys.privateKey
   )
 
-  user.pushDevices.forEach(({ sub }) => {
-    const payload: PayloadShape = {
-      options: {
-        badge: "/icon-512x512.png",
-        body: notification.text,
-        data: { url: "https://protocol.fun/eth/base_fee" },
-        icon: "/assets/eth.svg",
-        tag: "Test",
-        timestamp: notification.createdAt * 1000,
-        // image: "/icon-512x512.png",
-      },
-      title: notification.title,
-    }
+  const payload: PayloadShape = {
+    options: {
+      badge: "/icon-512x512.png",
+      body: notification.text,
+      timestamp: notification.createdAt * 1000,
+      // image: "/icon-512x512.png",
+      ...(alert
+        ? {
+            data: { url: `https://protocol.fun/${alert.protocolId}/${alert.metricId}` },
+            icon: `/assets/${alert.protocolId}.svg`,
+            tag: "Alerts",
+          }
+        : {
+            data: { url: "https://protocol.fun" },
+            icon: "",
+            tag: "General",
+          }),
+    },
+    title: notification.title,
+  }
 
-    webpush.sendNotification(sub, JSON.stringify(payload)).catch(logger.error)
+  const payloadStr = JSON.stringify(payload)
+
+  user.pushDevices.forEach(({ sub }) => {
+    webpush.sendNotification(sub, payloadStr).catch(logger.error)
   })
 }
