@@ -11,7 +11,9 @@ type PayloadShape = {
 
 export const sendPush = async (context: HookContext) => {
   const notification = context.result as Notification
-  const { alert } = notification
+  const alert = notification.alertId
+    ? await context.app.service("alerts").get(notification.alertId)
+    : null
   const user = await context.app.service("users").get(notification.userId)
 
   if (!user.pushDevices) return
@@ -31,13 +33,15 @@ export const sendPush = async (context: HookContext) => {
       // image: "/icon-512x512.png",
       ...(alert
         ? {
-            data: { url: `https://protocol.fun/${alert.protocolId}/${alert.metricId}` },
+            data: {
+              url: `https://protocol.fun/${alert.protocolId}/${alert.metricId}?unit=${alert.priceUnitIndex}&variant=${alert.variantIndex}`,
+            },
             icon: `/assets/${alert.protocolId}.svg`,
             tag: "Alerts",
           }
         : {
             data: { url: "https://protocol.fun" },
-            icon: "",
+            icon: "/icon-512x512.png",
             tag: "General",
           }),
     },

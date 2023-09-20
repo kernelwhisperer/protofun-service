@@ -1,10 +1,11 @@
 // For more information about this file see https://dove.feathersjs.com/guides/cli/service.schemas.html
 import type { FromSchema } from "@feathersjs/schema"
 import { getValidator, querySyntax, resolve, virtual } from "@feathersjs/schema"
+import { MetricId, ProtocolId } from "protofun"
 
 import type { HookContext } from "../../declarations"
 import { dataValidator, queryValidator } from "../../validators"
-import { AlertRaw, alertSchema } from "../alerts/alerts.schema"
+import { alertSchema } from "../alerts/alerts.schema"
 
 // Main data model schema
 export const notificationSchema = {
@@ -25,19 +26,25 @@ export const notificationSchema = {
   required: ["id", "text", "createdAt", "userId", "title"],
   type: "object",
 } as const
-export type Notification = FromSchema<
+export type NotificationRaw = FromSchema<
   typeof notificationSchema,
   {
     // All schema references need to be passed to get the correct type
     references: [typeof alertSchema]
   }
 >
+export type Notification = NotificationRaw & {
+  alert: {
+    metricId: MetricId
+    protocolId: ProtocolId
+  }
+}
+
 export const notificationValidator = getValidator(notificationSchema, dataValidator)
 export const notificationResolver = resolve<Notification, HookContext>({
   alert: virtual(async (message, context) => {
-    // Populate the user associated via `userId`
     if (!message.alertId) return
-    return context.app.service("alerts").get(message.alertId) as Promise<AlertRaw>
+    return context.app.service("alerts").get(message.alertId)
   }),
 })
 

@@ -16,12 +16,14 @@ export const alertSchema = {
     increase: { type: "boolean" },
     metricId: { type: "string" },
     paused: { type: "boolean" },
+    priceUnitIndex: { type: "number" },
     protocolId: { type: "string" },
     startTimestamp: { type: "string" },
     startValue: { type: "string" },
     triggerValue: { type: "string" },
     updatedAt: { type: "number" },
     userId: { type: "integer" },
+    variantIndex: { type: "number" },
   },
   required: [
     "id",
@@ -34,7 +36,8 @@ export const alertSchema = {
     "startTimestamp",
     "increase",
     "paused",
-    // priceUnitIndex TODO
+    "priceUnitIndex",
+    "variantIndex",
   ],
   type: "object",
 } as const
