@@ -63,6 +63,7 @@
     "@feathersjs/schema": "^5.0.8",
     "@feathersjs/socketio": "^5.0.8",
     "@feathersjs/transport-commons": "^5.0.8",
+    "@google-cloud/logging-winston": "^6.0.0",
     "chalk": "4",
     "decimal.js": "^10.4.3",
     "dotenv": "^16.3.1",
