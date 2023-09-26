@@ -76,8 +76,7 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
 
         const value = formatNumber(
           triggerValue.div(getMetricPrecision(metric, alert.variantIndex)).toNumber(),
-          getSignificantDigits(metric, alert.priceUnitIndex),
-          "compact"
+          getSignificantDigits(metric, alert.priceUnitIndex)
         )
 
         app.service(notificationPath).create({
@@ -123,7 +122,7 @@ export async function watcher(app: Application) {
 
   METRICS.forEach((metric) => {
     metric.priceUnits.forEach(async (priceUnit, priceUnitIndex) => {
-      const watcherId = yellowColor(`${metric.id} ${priceUnit}`)
+      const watcherId = yellowColor(`${metric.id}_${priceUnit.toLowerCase()}`)
 
       logger.info(`Notification watcher: ${watcherId} setup`)
 
@@ -143,10 +142,6 @@ export async function watcher(app: Application) {
           Math.min(acc, x.startTimestamp ? parseInt(x.startTimestamp) : Number.POSITIVE_INFINITY),
         Number.POSITIVE_INFINITY
       )
-      logger.info(
-        `Notification watcher: ${watcherId} computing, oldestTimestamp=${oldestTimestamp}`,
-        { alerts: metricAlerts }
-      )
 
       const initialCandles = (await query({
         limit: oldestTimestamp !== Number.POSITIVE_INFINITY ? undefined : 1,
@@ -155,14 +150,17 @@ export async function watcher(app: Application) {
         timeframe,
       })) as Candle[]
 
-      logger.info(
-        `Notification watcher: ${watcherId} initialCandles.length=${initialCandles.length}`
-      )
       processCandles(initialCandles, metricAlerts, app)
 
       const initialTimestamp = initialCandles[initialCandles.length - 1]?.timestamp
       logger.info(
-        `Notification watcher: ${watcherId} starting interval initialTimestamp=${initialTimestamp}`
+        `Notification watcher: ${watcherId} initialQuery, oldestTimestamp=${oldestTimestamp}`,
+        {
+          alerts: metricAlerts,
+          initialCandlesLength: initialCandles.length,
+          initialTimestamp,
+          oldestTimestamp,
+        }
       )
 
       subscribe({
@@ -170,10 +168,15 @@ export async function watcher(app: Application) {
           const metricAlerts = activeAlerts.filter(
             (x) => x.metricId === metric.id && x.priceUnitIndex === priceUnitIndex
           )
-          logger.info(`Notification watcher: ${watcherId} onNewData`, {
-            alerts: metricAlerts,
-            candle,
-          })
+          logger.info(
+            `Notification watcher: ${watcherId} onNewData ${new Date(
+              parseInt(candle.timestamp) * 1000
+            ).toISOString()}`,
+            {
+              alerts: metricAlerts,
+              candle,
+            }
+          )
           processCandles([candle], metricAlerts, app)
         },
         pollingInterval: metric.id === "base_fee" ? 6_000 : 12_000,

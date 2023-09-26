@@ -18,3 +18,14 @@ After commit & push:
   # cp .env.example .env
   npm run build && docker compose up -d
   ```
+
+## Debugging
+
+Inspect prod logs:
+
+```sh
+docker exec -it protofun-service-protofun-service-1 sh
+ls -l logs
+less logs/
+# docker cp protofun-service-protofun-service-1:/usr/src/app/logs .
+```

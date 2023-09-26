@@ -20,10 +20,22 @@ const logDate = new Date().toISOString()
 
 // Configure the Winston logger. For the complete documentation see https://github.com/winstonjs/winston
 export const logger = createLogger({
-  format: format.combine(
-    format.metadata({ fillExcept: ["message", "level", "timestamp", "label"] }),
-    isProduction ? format.json() : format.simple()
-  ),
+  format: isProduction
+    ? format.combine(
+        format.metadata({ fillExcept: ["message", "level", "timestamp", "label"] }),
+        format.json()
+      )
+    : format.combine(
+        format.metadata({ fillExcept: ["message", "level", "timestamp", "label"] }),
+        format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+        format.colorize(),
+        format.simple(),
+        format.printf(({ level, message, timestamp, metadata }) => {
+          return `${timestamp} ${level}:${message} ${
+            Object.keys(metadata).length > 0 ? "\n" + JSON.stringify(metadata) : ""
+          }`
+        })
+      ),
   // To see more detailed errors, change this to 'debug'
   level: "info",
   transports: isProduction
