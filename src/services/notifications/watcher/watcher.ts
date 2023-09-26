@@ -1,4 +1,3 @@
-import chalk from "chalk"
 import Decimal from "decimal.js"
 import {
   Candle,
@@ -13,7 +12,7 @@ import {
 
 import type { Application } from "../../../declarations"
 import { logger } from "../../../logger"
-import { loadMetricFns } from "../../../utils"
+import { blueColor, loadMetricFns, redColor, yellowColor } from "../../../utils"
 import { Alert, alertPath } from "../../alerts/alerts.shared"
 import { notificationPath } from "../notifications.shared"
 
@@ -34,7 +33,7 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
       let reason = ""
 
       logger.info(
-        chalk.blue(
+        blueColor(
           `Notification watcher: Checking ${alert.id}, candleRaw=${JSON.stringify(
             candleRaw
           )} triggerValue=${alert.triggerValue} startTimestamp=${alert.startTimestamp} `
@@ -62,7 +61,7 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
 
       if (shouldTrigger) {
         logger.info(
-          chalk.red(
+          redColor(
             `Notification watcher: Alert triggered ------------- ${alert.id}, reason:${reason}`
           )
         )
@@ -124,7 +123,7 @@ export async function watcher(app: Application) {
 
   METRICS.forEach((metric) => {
     metric.priceUnits.forEach(async (priceUnit, priceUnitIndex) => {
-      const watcherId = chalk.yellow(`${metric.id} ${priceUnit}`)
+      const watcherId = yellowColor(`${metric.id} ${priceUnit}`)
 
       logger.info(`Notification watcher: ${watcherId} setup`)
 
@@ -145,7 +144,8 @@ export async function watcher(app: Application) {
         Number.POSITIVE_INFINITY
       )
       logger.info(
-        `Notification watcher: ${watcherId} oldestTimestamp=${oldestTimestamp} metricAlerts.length=${metricAlerts.length}`
+        `Notification watcher: ${watcherId} computing, oldestTimestamp=${oldestTimestamp}`,
+        { meta: { alerts: metricAlerts } }
       )
 
       const initialCandles = (await query({
@@ -166,14 +166,14 @@ export async function watcher(app: Application) {
       )
 
       subscribe({
-        onNewData: (data: Candle) => {
+        onNewData: (candle: Candle) => {
           const metricAlerts = activeAlerts.filter(
             (x) => x.metricId === metric.id && x.priceUnitIndex === priceUnitIndex
           )
-          logger.info(
-            `${watcherId} metricAlerts=${JSON.stringify(metricAlerts)} data=${JSON.stringify(data)}`
-          )
-          processCandles([data], metricAlerts, app)
+          logger.info(`Notification watcher: ${watcherId} onNewData`, {
+            meta: { alerts: metricAlerts, candle },
+          })
+          processCandles([candle], metricAlerts, app)
         },
         pollingInterval: metric.id === "base_fee" ? 6_000 : 12_000,
         priceUnit,
