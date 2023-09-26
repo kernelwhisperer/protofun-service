@@ -71,7 +71,7 @@
     "feathers-permissions": "^2.1.4",
     "knex": "^2.5.1",
     "pg": "^8.11.1",
-    "protofun": "^0.2.6",
+    "protofun": "^0.2.7",
     "urql": "^4.0.5",
     "web-push": "^3.6.6",
     "winston": "^3.10.0"
