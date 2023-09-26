@@ -145,7 +145,7 @@ export async function watcher(app: Application) {
       )
       logger.info(
         `Notification watcher: ${watcherId} computing, oldestTimestamp=${oldestTimestamp}`,
-        { meta: { alerts: metricAlerts } }
+        { alerts: metricAlerts }
       )
 
       const initialCandles = (await query({
@@ -171,7 +171,8 @@ export async function watcher(app: Application) {
             (x) => x.metricId === metric.id && x.priceUnitIndex === priceUnitIndex
           )
           logger.info(`Notification watcher: ${watcherId} onNewData`, {
-            meta: { alerts: metricAlerts, candle },
+            alerts: metricAlerts,
+            candle,
           })
           processCandles([candle], metricAlerts, app)
         },
