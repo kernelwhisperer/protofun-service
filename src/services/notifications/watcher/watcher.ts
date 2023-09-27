@@ -143,12 +143,12 @@ export async function watcher(app: Application) {
         Number.POSITIVE_INFINITY
       )
 
-      const initialCandles = (await query({
+      const initialCandles = await query({
         limit: oldestTimestamp !== Number.POSITIVE_INFINITY ? undefined : 1,
         priceUnit,
         since: oldestTimestamp !== Number.POSITIVE_INFINITY ? String(oldestTimestamp) : undefined,
         timeframe,
-      })) as Candle[]
+      })
 
       processCandles(initialCandles, metricAlerts, app)
 

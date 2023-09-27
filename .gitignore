@@ -3,3 +3,4 @@ lib
 .env
 logs/
 google-logger-key.json
+screenshots/

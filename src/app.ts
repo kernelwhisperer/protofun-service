@@ -1,4 +1,5 @@
 import "./load-dotenv"
+import "./cron"
 
 // For more information about this file see https://dove.feathersjs.com/guides/cli/application.html
 import configuration from "@feathersjs/configuration"
