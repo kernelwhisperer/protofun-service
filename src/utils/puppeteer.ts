@@ -2,6 +2,7 @@ import { wait } from "protofun"
 import puppeteer from "puppeteer"
 
 import { logger } from "../logger"
+import { isProduction } from "../utils"
 import { ReportRequest } from "./report"
 
 const APP_URL = (process.env.APP_URL as string) || "https://protocol.fun"
@@ -19,7 +20,15 @@ export async function takeScreenshot(request: ReportRequest) {
     watermark = true,
   } = request
 
-  const browser = await puppeteer.launch({ args: ["--lang=bn-BD,bn"], headless: "new" })
+  const browser = await puppeteer.launch({
+    ...(isProduction
+      ? {
+          args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          executablePath: "/usr/bin/google-chrome", // add other args if needed
+        }
+      : {}),
+    headless: "new",
+  })
   const page = await browser.newPage()
   page.emulateTimezone("UTC")
   // console.log("1")

@@ -29,27 +29,31 @@ export const sendPush = async (context: HookContext) => {
 
   let imagePath = ""
   if (alert) {
-    const { protocolId, metricId, priceUnitIndex: priceUnit, variantIndex: variant } = alert
-    const thisDailyCandle = getLatestCandleTimestamp("Day")
-    const pastWeekCandle = getLatestCandleTimestamp("Day") - 7 * CANDLE_INTERVAL_SECONDS.Day
-    const since = String(pastWeekCandle)
-    const until = String(thisDailyCandle)
-    // TODO: check how old is the alert
-    const timeframe = "Hour"
+    try {
+      const { protocolId, metricId, priceUnitIndex: priceUnit, variantIndex: variant } = alert
+      const thisDailyCandle = getLatestCandleTimestamp("Day")
+      const pastWeekCandle = getLatestCandleTimestamp("Day") - 7 * CANDLE_INTERVAL_SECONDS.Day
+      const since = String(pastWeekCandle)
+      const until = String(thisDailyCandle)
+      // TODO: check how old is the alert
+      const timeframe = "Hour"
 
-    await takeScreenshot({
-      metricId,
-      priceUnit,
-      protocolId,
-      since,
-      timeframe,
-      until,
-      variant,
-      watermark: false,
-    })
+      await takeScreenshot({
+        metricId,
+        priceUnit,
+        protocolId,
+        since,
+        timeframe,
+        until,
+        variant,
+        watermark: false,
+      })
 
-    const fileName = `${protocolId}-${metricId}-${variant}-${priceUnit}-${timeframe.toLowerCase()}-${until}.png`
-    imagePath = `http://localhost:3030/snaps/${fileName}`
+      const fileName = `${protocolId}-${metricId}-${variant}-${priceUnit}-${timeframe.toLowerCase()}-${until}.png`
+      imagePath = `http://localhost:3030/snaps/${fileName}`
+    } catch (error) {
+      logger.error("Send-push failed to get screenshot", { error })
+    }
   }
 
   const payload: PayloadShape = {
