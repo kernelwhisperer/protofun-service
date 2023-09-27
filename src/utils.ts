@@ -24,3 +24,7 @@ export function blueColor(text: string) {
 export function yellowColor(text: string) {
   return isProduction ? text : chalk.yellow(text)
 }
+
+export const serviceAddress = isProduction
+  ? "https://service.protocol.fun"
+  : "http://localhost:3030"

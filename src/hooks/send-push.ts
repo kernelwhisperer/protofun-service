@@ -3,6 +3,7 @@ import webpush from "web-push"
 import { Notification } from "../client"
 import type { HookContext } from "../declarations"
 import { logger } from "../logger"
+import { serviceAddress } from "../utils"
 import { takeScreenshot } from "../utils/puppeteer"
 import { CANDLE_INTERVAL_SECONDS, getLatestCandleTimestamp } from "../utils/report"
 
@@ -50,7 +51,7 @@ export const sendPush = async (context: HookContext) => {
       })
 
       const fileName = `${protocolId}-${metricId}-${variant}-${priceUnit}-${timeframe.toLowerCase()}-${until}.png`
-      imagePath = `http://localhost:3030/snaps/${fileName}`
+      imagePath = `${serviceAddress}/snaps/${fileName}`
     } catch (error) {
       logger.error("Send-push failed to get screenshot", { error })
     }
