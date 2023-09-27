@@ -32,10 +32,10 @@ export const sendPush = async (context: HookContext) => {
   if (alert) {
     try {
       const { protocolId, metricId, priceUnitIndex: priceUnit, variantIndex: variant } = alert
-      const thisDailyCandle = getLatestCandleTimestamp("Day")
+      const thisHourlyCandle = getLatestCandleTimestamp("Hour")
       const pastWeekCandle = getLatestCandleTimestamp("Day") - 7 * CANDLE_INTERVAL_SECONDS.Day
       const since = String(pastWeekCandle)
-      const until = String(thisDailyCandle)
+      const until = String(thisHourlyCandle)
       // TODO: check how old is the alert
       const timeframe = "Hour"
 
