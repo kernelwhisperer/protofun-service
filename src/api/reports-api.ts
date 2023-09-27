@@ -115,7 +115,7 @@ ${metricTitle} has ${changeDirection} ${percentageChange
   const lastCandleTimestamp = candles[candles.length - 1].timestamp
 
   const fileName = `${protocolId}-${metricId}-${variant}-${priceUnit}-${timeframe.toLowerCase()}-${lastCandleTimestamp}.png`
-  const filePath = path.join(path.join(__dirname, "../../screenshots"), fileName)
+  const filePath = path.join(path.join(__dirname, "../../public/snaps"), fileName)
 
   await sendTelegramPhoto(filePath, caption)
 }

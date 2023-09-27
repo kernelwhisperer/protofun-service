@@ -7,7 +7,17 @@ import { ReportRequest } from "./report"
 const APP_URL = (process.env.APP_URL as string) || "https://protocol.fun"
 
 export async function takeScreenshot(request: ReportRequest) {
-  const { metricId, protocolId, since, timeframe, until, variant, priceUnit } = request
+  const {
+    metricId,
+    protocolId,
+    since,
+    timeframe,
+    until,
+    variant,
+    priceUnit,
+    screenWidth = 1920,
+    watermark = true,
+  } = request
 
   const browser = await puppeteer.launch({ args: ["--lang=bn-BD,bn"], headless: "new" })
   const page = await browser.newPage()
@@ -21,18 +31,19 @@ export async function takeScreenshot(request: ReportRequest) {
     unit: String(priceUnit),
     until,
     variant: String(variant),
+    watermark: String(watermark),
   })
   const url = `${APP_URL}/${protocolId}/${metricId}?${params}`
   await page.goto(url)
-  logger.info("Screenshot url", url)
+  logger.info("Screenshot url", { url })
 
-  await page.setViewport({ deviceScaleFactor: 2, height: 1080, width: 1920 })
+  await page.setViewport({ deviceScaleFactor: 2, height: 1080, width: screenWidth })
   // console.log("3")
 
   const client = await page.target().createCDPSession()
   await client.send("Page.setDownloadBehavior", {
     behavior: "allow",
-    downloadPath: "./screenshots",
+    downloadPath: "./public/snaps",
   })
   // console.log("4")
 

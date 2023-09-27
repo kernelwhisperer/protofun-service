@@ -40,10 +40,12 @@ export type ReportRequest = {
   metricId: MetricId
   priceUnit: number
   protocolId: ProtocolId
+  screenWidth?: number
   since: string
   timeframe: Timeframe
   until: string
   variant: number
+  watermark?: boolean
 }
 
 /**

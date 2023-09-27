@@ -3,6 +3,8 @@ import webpush from "web-push"
 import { Notification } from "../client"
 import type { HookContext } from "../declarations"
 import { logger } from "../logger"
+import { takeScreenshot } from "../utils/puppeteer"
+import { CANDLE_INTERVAL_SECONDS, getLatestCandleTimestamp } from "../utils/report"
 
 type PayloadShape = {
   options: NotificationOptions
@@ -25,6 +27,31 @@ export const sendPush = async (context: HookContext) => {
     vapidKeys.privateKey
   )
 
+  let imagePath = ""
+  if (alert) {
+    const { protocolId, metricId, priceUnitIndex: priceUnit, variantIndex: variant } = alert
+    const thisDailyCandle = getLatestCandleTimestamp("Day")
+    const pastWeekCandle = getLatestCandleTimestamp("Day") - 7 * CANDLE_INTERVAL_SECONDS.Day
+    const since = String(pastWeekCandle)
+    const until = String(thisDailyCandle)
+    // TODO: check how old is the alert
+    const timeframe = "Hour"
+
+    await takeScreenshot({
+      metricId,
+      priceUnit,
+      protocolId,
+      since,
+      timeframe,
+      until,
+      variant,
+      watermark: false,
+    })
+
+    const fileName = `${protocolId}-${metricId}-${variant}-${priceUnit}-${timeframe.toLowerCase()}-${until}.png`
+    imagePath = `http://localhost:3030/snaps/${fileName}`
+  }
+
   const payload: PayloadShape = {
     options: {
       badge: "/icon-512x512.png",
@@ -37,6 +64,7 @@ export const sendPush = async (context: HookContext) => {
               url: `https://protocol.fun/${alert.protocolId}/${alert.metricId}?unit=${alert.priceUnitIndex}&variant=${alert.variantIndex}`,
             },
             icon: `/assets/${alert.protocolId}.svg`,
+            image: imagePath,
             tag: "Alerts",
           }
         : {
