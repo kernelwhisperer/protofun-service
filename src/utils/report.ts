@@ -38,13 +38,16 @@ export function getLatestCandleTimestamp(timeframe: Timeframe) {
 
 export type ReportRequest = {
   metricId: MetricId
-  priceUnit: number
+  priceUnit?: number
   protocolId: ProtocolId
+  variant?: number
+}
+
+export type ReportSnapRequest = Required<ReportRequest> & {
   screenWidth?: number
   since: string
   timeframe: Timeframe
   until: string
-  variant: number
   watermark?: boolean
 }
 
@@ -62,4 +65,10 @@ export function getWeekNumber(timestampInSeconds: number) {
 
   const weekNumber = Math.ceil(dayOfYear / 7) // Week number
   return weekNumber
+}
+
+export function mergeMessages(title: string, body: string) {
+  return `${title}
+
+${body}`
 }

@@ -1,26 +1,22 @@
 import Decimal from "decimal.js"
 import path from "path"
-import {
-  getMetric,
-  getMetricPrecision,
-  getSignificantDigits,
-  MetricId,
-  PROTOCOL_MAP,
-  ProtocolId,
-} from "protofun"
+import { getMetric, getMetricPrecision, getSignificantDigits, PROTOCOL_MAP } from "protofun"
 
 import { logger } from "../logger"
 import { loadMetricFns } from "../utils"
-import { takeScreenshot } from "../utils/puppeteer"
-import { CANDLE_INTERVAL_SECONDS, getLatestCandleTimestamp, getWeekNumber } from "../utils/report"
+import { takeSnap } from "../utils/puppeteer"
+import {
+  CANDLE_INTERVAL_SECONDS,
+  getLatestCandleTimestamp,
+  getWeekNumber,
+  mergeMessages,
+  ReportRequest,
+} from "../utils/report"
 import { sendTelegramPhoto } from "../utils/telegram"
+import { sendTweetWithPhotos } from "../utils/twitter"
 
-export async function createReport(
-  protocolId: ProtocolId,
-  metricId: MetricId,
-  variant = 0,
-  priceUnit = 0
-) {
+export async function createSingleReport(request: ReportRequest) {
+  const { protocolId, metricId, variant = 0, priceUnit = 0 } = request
   const { query } = await loadMetricFns(protocolId, metricId)
 
   const thisWeekCandle = getLatestCandleTimestamp("Week")
@@ -81,25 +77,23 @@ export async function createReport(
   })
 
   const decimalJsFormatter = (x: Decimal) =>
-    formatter.format(x.div(getMetricPrecision(metric, variant)).toNumber()).replace(".", "\\.")
+    formatter.format(x.div(getMetricPrecision(metric, variant)).toNumber())
 
   let metricTitle = metric.title
 
   if (metric.variants && metric.variants.length > 0) {
-    metricTitle += ` \\(${metric.variants[variant].label}\\)`
+    metricTitle += ` (${metric.variants[variant].label})`
   }
 
-  const caption = `Week \\#${getWeekNumber(lastWeekCandle)} for ${protocol.title}\\.
-
-${metricTitle} has ${changeDirection} ${percentageChange
+  const title = `Week #${getWeekNumber(lastWeekCandle)}`
+  const body = `${metricTitle} has ${changeDirection} ${percentageChange
     .abs()
-    .toFixed(2)
-    .replace(".", "\\.")}% to *${decimalJsFormatter(close)} ${unitLabel}*\\.`
+    .toFixed(0)}% to *${decimalJsFormatter(close)} ${unitLabel}*.`
 
   /**
    * Screenshot
    */
-  await takeScreenshot({
+  await takeSnap({
     metricId,
     priceUnit,
     protocolId,
@@ -117,5 +111,44 @@ ${metricTitle} has ${changeDirection} ${percentageChange
   const fileName = `${protocolId}-${metricId}-${variant}-${priceUnit}-${timeframe.toLowerCase()}-${lastCandleTimestamp}.png`
   const filePath = path.join(path.join(__dirname, "../../public/snaps"), fileName)
 
-  await sendTelegramPhoto(filePath, caption)
+  return { body, filePath, title }
+}
+
+export async function sendWeeklyEthereumReport() {
+  logger.info("Report: sendWeeklyEthereumReport start")
+  const results = await Promise.all([
+    createSingleReport({ metricId: "base_fee", protocolId: "eth" }),
+    createSingleReport({ metricId: "tx_cost", protocolId: "eth", variant: 2 }),
+    createSingleReport({ metricId: "tx_cost", protocolId: "eth", variant: 5 }),
+    createSingleReport({ metricId: "eth_price", protocolId: "eth" }),
+  ])
+
+  /**
+   * Telegram
+   */
+  try {
+    for (const result of results) {
+      const { body, title, filePath } = result
+      await sendTelegramPhoto(filePath, mergeMessages(title, body))
+    }
+  } catch (error) {
+    logger.error(`Cannot send telegram report ${String(error)}`, { error })
+  }
+
+  /**
+   * Twitter
+   */
+  try {
+    const title = results[0].title
+    const body = results.map((x) => x.body).join("\n\n")
+
+    await sendTweetWithPhotos(
+      results.map((x) => x.filePath),
+      mergeMessages(mergeMessages(title, body), "#Ethereum #GasFee #ETH $ETH")
+    )
+  } catch (error) {
+    logger.error(`Cannot send twitter report ${String(error)}`, { error })
+  }
+
+  logger.info("Report: sendWeeklyEthereumReport end")
 }

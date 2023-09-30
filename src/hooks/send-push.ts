@@ -4,13 +4,15 @@ import { Notification } from "../client"
 import type { HookContext } from "../declarations"
 import { logger } from "../logger"
 import { serviceAddress } from "../utils"
-import { takeScreenshot } from "../utils/puppeteer"
+import { takeSnap } from "../utils/puppeteer"
 import { CANDLE_INTERVAL_SECONDS, getLatestCandleTimestamp } from "../utils/report"
 
 type PayloadShape = {
   options: NotificationOptions
   title: string
 }
+
+const APP_URL = process.env.APP_URL as string
 
 export const sendPush = async (context: HookContext) => {
   const notification = context.result as Notification
@@ -39,7 +41,7 @@ export const sendPush = async (context: HookContext) => {
       // TODO: check how old is the alert
       const timeframe = "Hour"
 
-      await takeScreenshot({
+      await takeSnap({
         metricId,
         priceUnit,
         protocolId,
@@ -66,14 +68,14 @@ export const sendPush = async (context: HookContext) => {
       ...(alert
         ? {
             data: {
-              url: `https://protocol.fun/${alert.protocolId}/${alert.metricId}?unit=${alert.priceUnitIndex}&variant=${alert.variantIndex}`,
+              url: `${APP_URL}/${alert.protocolId}/${alert.metricId}?unit=${alert.priceUnitIndex}&variant=${alert.variantIndex}`,
             },
             icon: `/assets/${alert.protocolId}.svg`,
             image: imagePath,
             tag: "Alerts",
           }
         : {
-            data: { url: "https://protocol.fun" },
+            data: { url: APP_URL },
             icon: "/icon-512x512.png",
             tag: "General",
           }),

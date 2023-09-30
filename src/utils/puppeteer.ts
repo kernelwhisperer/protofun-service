@@ -3,11 +3,11 @@ import puppeteer from "puppeteer"
 
 import { logger } from "../logger"
 import { isProduction } from "../utils"
-import { ReportRequest } from "./report"
+import { ReportSnapRequest } from "./report"
 
-const APP_URL = (process.env.APP_URL as string) || "https://protocol.fun"
+const APP_URL = process.env.APP_URL as string
 
-export async function takeScreenshot(request: ReportRequest) {
+export async function takeSnap(request: ReportSnapRequest) {
   const {
     metricId,
     protocolId,
@@ -43,8 +43,8 @@ export async function takeScreenshot(request: ReportRequest) {
     watermark: String(watermark),
   })
   const url = `${APP_URL}/${protocolId}/${metricId}?${params}`
-  await page.goto(url)
   logger.info("Screenshot url", { url })
+  await page.goto(url)
 
   await page.setViewport({ deviceScaleFactor: 2, height: 1080, width: screenWidth })
   // console.log("3")
