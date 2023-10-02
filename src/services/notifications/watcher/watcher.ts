@@ -163,27 +163,30 @@ export async function watcher(app: Application) {
         }
       )
 
-      subscribe({
-        onNewData: (candle: Candle) => {
-          const metricAlerts = activeAlerts.filter(
-            (x) => x.metricId === metric.id && x.priceUnitIndex === priceUnitIndex
-          )
-          logger.info(
-            `Notification watcher: ${watcherId} onNewData ${new Date(
-              parseInt(candle.timestamp) * 1000
-            ).toISOString()}`,
-            {
-              alerts: metricAlerts,
-              candle,
-            }
-          )
-          processCandles([candle], metricAlerts, app)
+      subscribe(
+        {
+          onNewData: (candle: Candle) => {
+            const metricAlerts = activeAlerts.filter(
+              (x) => x.metricId === metric.id && x.priceUnitIndex === priceUnitIndex
+            )
+            logger.info(
+              `Notification watcher: ${watcherId} onNewData ${new Date(
+                parseInt(candle.timestamp) * 1000
+              ).toISOString()}`,
+              {
+                alerts: metricAlerts,
+                candle,
+              }
+            )
+            processCandles([candle], metricAlerts, app)
+          },
+          pollingInterval: metric.id === "base_fee" ? 6_000 : 30_000,
+          priceUnit,
+          since: initialTimestamp,
+          timeframe,
         },
-        pollingInterval: metric.id === "base_fee" ? 6_000 : 30_000,
-        priceUnit,
-        since: initialTimestamp,
-        timeframe,
-      })
+        logger.info
+      )
     })
   })
 }

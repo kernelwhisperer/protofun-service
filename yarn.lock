@@ -4439,10 +4439,10 @@ protobufjs@7.2.5, protobufjs@^7.0.0, protobufjs@^7.2.4:
     "@types/node" ">=13.7.0"
     long "^5.0.0"
 
-protofun@^0.2.8:
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/protofun/-/protofun-0.2.8.tgz#86a048d66999752206763c8a4a33e0332079280b"
-  integrity sha512-ekiXkJ5GqB2+36ep7wtaO6Jl+/if5ImLJV32aNmCZUACgE244Hsicl/oNrgfacqFk8JLzLGONWyxVRi73vY+1A==
+protofun@^0.2.9:
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/protofun/-/protofun-0.2.9.tgz#e2427860c9e209bd58bd3698f94034b4d917baa1"
+  integrity sha512-KbSKSlPU42a2h4VF+vpPvr0MxNxwRu3xdjqDPkq0CHY+aeIEAOFCTZsUlZ89u/3Siz6vF26GfMTERoLeUkPG4A==
 
 proxy-addr@~2.0.7:
   version "2.0.7"
