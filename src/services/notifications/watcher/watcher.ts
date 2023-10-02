@@ -179,7 +179,7 @@ export async function watcher(app: Application) {
           )
           processCandles([candle], metricAlerts, app)
         },
-        pollingInterval: metric.id === "base_fee" ? 6_000 : 12_000,
+        pollingInterval: metric.id === "base_fee" ? 6_000 : 30_000,
         priceUnit,
         since: initialTimestamp,
         timeframe,
