@@ -81,8 +81,8 @@ function processCandles(candles: Candle[], alerts: Alert[], app: Application) {
 
         app.service(notificationPath).create({
           alertId: alert.id,
-          text: `${protocol.title}'s ${metric.title} ${
-            metric.variants ? `(${metric.variants[alert.variantIndex].label})` : ""
+          text: `${protocol.title}'s ${metric.title}${
+            metric.variants ? ` (${metric.variants[alert.variantIndex].label})` : ""
           } ${alert.increase ? "increased" : "decreased"} to ${value} ${unitLabel}.`,
           title: metric.title,
           userId: alert.userId,
